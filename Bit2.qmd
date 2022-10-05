@@ -1,0 +1,151 @@
+# Bitacora 1
+\renewcommand\tablename{Tabla}
+
+```{r, R.options, echo=F, include=F, warning=F, message=F}
+options(knitr.kable.NA = '-', echo = F)
+library(readxl)
+library(kableExtra)
+library(dplyr)
+
+```
+
+## Punto 1
+
+En la @tbl-tidy1 y @tbl-tidy2 se presentan las primeras cinco líneas de la tabla de datos para las columnas 1 a 9 y 10 a 18 respectivamente. En conformidad con @wickham2016r, una tabla en formato *tidy* cumple que:
+
+- Cada variable possee su propia columna
+
+- Cada observación posee su propia fila
+
+- Cada valor posee su propia celda
+
+Se puede apreciar en las dos tablas mencionadas que la tabla de datos cumple con el formato *tidy*, pues las variables están dispuestas a lo largo de las columnas y las observaciones a lo largo de las filas. 
+
+
+```{r, echo=F, include=F}
+
+base <- data.frame(read_excel("sepoblacev1950-2020_0.xls", 
+    range = "B9:S80", col_types = "numeric"))
+
+colnames(base) <- c("Año",
+                    "Población total",
+                    "Población de hombres",
+                    "Población de mujeres",
+                    "Nacimientos",
+                    "Defunciones",
+                    "Defunciones infantiles",
+                    "Defunciones neonatales",
+                    "Defunciones fetales",
+                    "Tasa de crecimiento",
+                    "Tasa de natalidad",
+                    "Tasa de mortalidad",
+                    "Tasa de mortalidad infantil",
+                    "Tasa de mortalidad neonatal",
+                    "Tasa de mortalidad fetal",
+                    "Tasa global de fecundidad",
+                    "Tasa bruta de reproducción",
+                    "Tasa neta de reproducción"				
+)
+
+
+tabla_tidy1 <- head(base[1:9]) %>%
+  kbl(align = rep('r', ncol(head(base[1:9]))),
+      format.args = list(big.mark = ' '),booktabs=T) %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  footnote(general = "El conteo de población se realiza al 30 de junio de cada año.", general_title = "Nota") %>%  kable_styling(full_width = F) %>%   kable_classic_2() %>%
+  row_spec(0,bold=TRUE) %>% 
+    column_spec(1:9,width = "3cm") %>% 
+  scroll_box()
+
+tabla_tidy2 <- head(base[10:18]) %>%
+  kbl(align = rep('r', ncol(head(base[10:18]))),
+      format.args = list(big.mark = ' '),booktabs=T) %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  footnote(general = "El conteo de población se realiza al 30 de junio de cada año.", general_title = "Nota") %>%  kable_styling(full_width = F) %>%   kable_classic_2() %>%
+  row_spec(0,bold=TRUE) %>% 
+    column_spec(1:9,width = "3cm") %>% 
+  scroll_box()
+```
+
+
+```{r, echo=F}
+#| tbl-cap: "Primeras cinco filas y nueve columnas de la tabla de datos"
+#| label: tbl-tidy1
+
+
+landscape(tabla_tidy1, margin = NULL)
+```
+
+
+```{r, echo=FALSE}
+#| tbl-cap: "Primeras cinco filas y segundas nueve columnas de la tabla de datos"
+#| label: tbl-tidy2
+
+landscape(tabla_tidy2, margin = NULL)
+rm(tabla_tidy1, tabla_tidy2)
+```
+
+## Parte 2
+
+### Resumen de cinco números
+
+En la tabla @tbl-resumen5numeros se detalla el resumen de cinco números para algunas variables relevantes de la tabla de datos.
+
+```{r, echo=F}
+#| tbl-cap: "Resumen de cinco números para algunas variables de la tabla de datos"
+#| label: tbl-resumen5numeros
+
+resumen <- apply(base[,2:9], 2, fivenum) %>% as.data.frame()
+
+row.names(resumen) <- c("Mínimo", "Primer cuartil", "Mediana", "Tercer cuartil", "Máximo") 
+
+tabla <- resumen %>%
+  kbl(align = rep('r', ncol(resumen)),
+      format.args = list(big.mark = ' '),booktabs=T)  %>%  column_spec(1,bold = TRUE) %>%
+  row_spec(0,bold=TRUE)  %>% 
+      column_spec(1:9,width = "3cm") %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(full_width = F) %>% 
+  kable_classic_2() %>% 
+  scroll_box()
+
+tabla
+```
+
+### Medidas de dispersión
+
+En la tabla @tbl-estadisticos_dispersion se detallan los estadísticos de desviación estándar y rango intercuartílico para algunas variables relevante de la tabla de datos.
+
+```{r, echo=F}
+#| tbl-cap: "Estadísticos de dispersión para algunas variables de la tabla de datos"
+#| label: tbl-estadisticos_dispersion 
+
+
+estadisticos_dispersion <- function(x){
+  return(c(sd(x), IQR(x)))
+}
+
+resumen <- apply(base[,2:9], 2, estadisticos_dispersion) %>% as.data.frame()
+
+row.names(resumen) <- c("Desviación estándar", "Rango intercuartílico") 
+
+tabla <- resumen %>%
+  kbl(align = rep('r', ncol(resumen)),
+      format.args = list(big.mark = ' '),booktabs=T)  %>%  column_spec(1,bold = TRUE) %>%
+  row_spec(0,bold=TRUE)  %>% 
+      column_spec(1:9,width = "3cm") %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(full_width = F) %>% 
+  kable_classic_2() %>% 
+  scroll_box()
+
+tabla
+```
+
+Se observa que la variable población de hombres presenta mayor dispersión respecto población de mujeres, esta mayor variabilidad en la población de hombres se puede deber a diversos factores, entre ellos : una diferencia en el número de defunciones, nacimientos, o número de migrantes en la población masculina en relación con la de población femenina.
+
+Una observación importante, es que los nacimientos presentan una mayor dispersión respecto a el número de defunciones. Es decir, se observa que el número defunciones anuales presenta menor desviación respecto a la media (desviación estándar) y una menor diferencia entre tercer cuartil y primer cuartil de defunciones (IQR).
+
+Análogamente, se observa que para los tipos de defunción: infantil, neonatales y fetales. Se evidencia una mayor dispersión para las defunciones infantiles, seguidas de las neonatales y por último, con menor dispersión las defunciones fetales. 
+
+Finalmente, se observa una diferencia significativa entre la medidas de dispersión desviación estándar y rango intercuartílico (IQR), esto se debe a la sensibilidad de la desviación estándar a valores extremos, es decir es  posible que existan valores extremos (muy alto o muy bajos respecto a la media) y por esta razón ambas medidas difieran considerablemente, sin embargo para este caso en particular el orden en el grado de dispersión (observe que la dispersión disminuye al avanzar en la tabla de izquierda a derecha) se mantiene para ambos medidas. 
