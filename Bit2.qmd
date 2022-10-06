@@ -1,4 +1,4 @@
-# Bitacora 1
+# Bitacora 2
 \renewcommand\tablename{Tabla}
 
 ```{r, R.options, echo=F, include=F, warning=F, message=F}
@@ -6,7 +6,8 @@ options(knitr.kable.NA = '-', echo = F)
 library(readxl)
 library(kableExtra)
 library(dplyr)
-
+library(ggplot2)
+library(janitor)
 ```
 
 ## Punto 1
@@ -149,3 +150,64 @@ Una observación importante, es que los nacimientos presentan una mayor dispersi
 Análogamente, se observa que para los tipos de defunción: infantil, neonatales y fetales. Se evidencia una mayor dispersión para las defunciones infantiles, seguidas de las neonatales y por último, con menor dispersión las defunciones fetales. 
 
 Finalmente, se observa una diferencia significativa entre la medidas de dispersión desviación estándar y rango intercuartílico (IQR), esto se debe a la sensibilidad de la desviación estándar a valores extremos, es decir es  posible que existan valores extremos (muy alto o muy bajos respecto a la media) y por esta razón ambas medidas difieran considerablemente, sin embargo para este caso en particular el orden en el grado de dispersión (observe que la dispersión disminuye al avanzar en la tabla de izquierda a derecha) se mantiene para ambos medidas. 
+
+\newpage
+
+### Tablas de frecuencia
+
+```{r}
+#| echo: false
+base <- base %>% clean_names()
+```
+
+```{r}
+#| echo: false
+df <- base %>% mutate( defunciones = cut(defunciones , breaks = 10)) %>% 
+   group_by(defunciones) %>% 
+   summarise(n_defunciones = n() )
+
+df2 <- base %>% mutate( tamanio_poblacion = 
+                          cut(poblacion_total, breaks = 10)) %>% 
+   group_by( tamanio_poblacion ) %>% 
+   summarise(n_pop = n() )
+
+df3 <- base %>%
+  mutate( tasas = cut(tasa_de_mortalidad, breaks = 11)) %>% 
+   group_by( tasas ) %>% 
+   summarise(n_pop = n() )
+```
+
+```{r}
+#| tbl-cap: "Frecuencia de defunciones, población y tasa de mortalidad"
+#| label: tbl-freq1
+#| tbl-pos: 'h'
+#| echo: false
+
+data.frame(df, df2, df3) %>%
+  kbl( align = 'cccccc', col.names=c("Defunciones", 
+                   "Frec. de defunciones", 
+                   "Población total", 
+                   "Frec. de poblacion", 
+                   "Tasa de mortalidad", 
+                   "Frec. de tasa"), 
+       format.args = list(big.mark = ' '),booktabs=T) %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(full_width = F) %>% 
+  kable_classic_2() %>%
+  row_spec(0,bold=TRUE) %>% 
+  scroll_box()
+```
+
+De la @tbl-freq1 se observa que históricamente las defunciones totales de la mayoría de los años cae dentro del primero y segundo intervalo, con una distribución más uniforme dentro de los intervalos más altos. Por su parte la tasa de mortalidad bruta, la cual se aprecia en las columnas cinco y seis, se muestra que en la mayoría de años la tasa se ha mantenido entre 3.72 y 4.41. Esto quiere decir que la cantidad de defunciones relativo a la población ha sido más o menos constante en la mayoría de años. Por su parte, la población total se ha distribuido más uniformemente en todos los intervalos por lo que se concluye que el crecimiento población se ha movido más rápido que las defunciones. 
+
+
+
+
+## Parte 3: Propuesta de UVE
+
+![Borrador de la UVE Heurística](Images/UVE%20Flecha.png){fig-align="center" width="600"}
+
+
+
+
+
