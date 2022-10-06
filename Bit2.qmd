@@ -201,6 +201,41 @@ data.frame(df, df2, df3) %>%
 De la @tbl-freq1 se observa que históricamente las defunciones totales de la mayoría de los años cae dentro del primero y segundo intervalo, con una distribución más uniforme dentro de los intervalos más altos. Por su parte la tasa de mortalidad bruta, la cual se aprecia en las columnas cinco y seis, se muestra que en la mayoría de años la tasa se ha mantenido entre 3.72 y 4.41. Esto quiere decir que la cantidad de defunciones relativo a la población ha sido más o menos constante en la mayoría de años. Por su parte, la población total se ha distribuido más uniformemente en todos los intervalos por lo que se concluye que el crecimiento población se ha movido más rápido que las defunciones. 
 
 
+```{r}
+#| echo: false
+dfnacimientos <- base %>% mutate( nacimientos = cut( nacimientos , breaks = 10)) %>% 
+   group_by(nacimientos) %>% 
+   summarise(n_nacimientos= n() )
+
+df2nacimientos <- base %>%
+  mutate( tasasnat = cut(base$tasa_de_natalidad, breaks = 10)) %>% 
+   group_by( tasasnat ) %>% 
+   summarise(n_pop = n() )
+```
+
+```{r}
+#| tbl-cap: "Frecuencia de nacimientos y tasa de natalidad"
+#| label: tbl-freq2
+#| tbl-pos: 'h'
+#| echo: false
+
+data.frame(dfnacimientos, df2nacimientos) %>%
+  kbl( align = 'cccccc', col.names=c("Nacimientos", 
+                   "Frec. de nacimientos", 
+                   "Tasa de nacimientos", 
+                   "Frec. de tasa"), 
+       format.args = list(big.mark = ' '),booktabs=T) %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(full_width = F) %>% 
+  kable_classic_2() %>%
+  row_spec(0,bold=TRUE) %>% 
+  scroll_box()
+
+```
+
+En la tabla @tbl-freq2 se observa que los nacimientos en nuestro país a lo largo de los años tiene una distribución más uniforme para los últimos intervalos de la tabla.
+
+Por otro lado, para el caso de la tasa de nacimientos se observa un comportamiento menos uniforme a diferencia de los observado para la tasa de mortalidad. En este caso, se observa que la frecuencia oscila entre valores menores a 6 pero con ciertos repuntes altos de frecuencia para ciertos intervalos por lo que la tasa de nacimientos no se mantiene en cierto intervalo específico. 
 
 
 ## Parte 3: Propuesta de UVE
