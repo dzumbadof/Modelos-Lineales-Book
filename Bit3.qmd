@@ -41,7 +41,7 @@ La densidad de predicción de estado de k-pasos con  $k \geq 1$ hacia adelante d
 $$  a_{t+k} = G_{t+k}m_{t} $$
 $$ R_{t+k}= G_{t+k}C_{t+k}G^{'}_{t+k} + W_{t+k} $$
 
-La densidad de predicción de k-pasos con  $k \geq 1$ hacia adelante de $Y_{t+k}$ dada  la información pasada $D_{t}$, es Gaussiana  con media y varianza condicional dadas respectivamente por:
+La densidad de predicción de $k$-pasos con  $k \geq 1$ hacia adelante de $Y_{t+k}$ dada  la información pasada $D_{t}$, es Gaussiana  con media y varianza condicional dadas respectivamente por:
 
 $$  f_{t+k} = F_{t+k}a_{t+k} $$
 $$ Q_{t+k}= F_{t+k}R_{t+k}F^{'}_{t+k} + V_{t+k} $$
@@ -65,7 +65,7 @@ Se propone un modelo DLM de primer orden ya que como establece @optimalDLM los D
 Por su parte @optimalDLM, señala que los DLM de segundo orden son útiles para describir tendencias. Dada la tendencia observada de la serie de defunciones totales sugiere por tanto realizar un modelo  polinomial de segundo orden.
 
 
- # Primera implementación
+ ## Primera implementación
 
 Como una primer implementación se utilizará un modelo ARIMA. Tal como lo menciona @petrisDLM un modelo ARIMA puede ser considerado un DLM, esto ya que es posible representar todo modelo ARIMA (ya sea univariado o mulltivariado) como un DLM. 
 
