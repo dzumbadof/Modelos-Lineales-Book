@@ -1,4 +1,85 @@
 # Bitacora 3
 
-Aqui se hace la bitacora 3. 
+
+
+# Descripción del modelo o metodología
+
+
+Con la finalidad de realizar un pronóstico de la serie de defunciones totales anuales de Costa Rica, se desea implementar el modelo estadístico que mejor se ajuste a los datos.
+
+Para nuestro estudio en cuestión, se ha optado por realizar una implementación de Modelos de Espacio-Estado.Particularmente, 
+ Modelos Dinámicos Lineales (DLM). 
+
+Tal como lo establece @petrisDLM, estos últimos son una clase de Modelos de Espacio-Estado también llamados Modelos de Espacio-Estado Lineales Gaussianos. Estos modelos son especificados mediante dos ecuaciones, para $t \geq 1 $ se tiene:
+
+$$ Y_{t}= F_{t} \theta_{t} + v_{t} , $$
+$$  \theta_{t}= G_{t} \theta_{t-1} + w_{t}   $$
+
+Donde la primer ecuación es llamada ecuación de observación, y la segunda ecuación estado o ecuación del sistema.
+
+Es importante señalar que $F_{t}$ y $G_{t}$ son matrices y $(v_{t})$ , $(w_{t})$ son secuencias de ruidos blancos independientes tales que:
+
+$$ v_{t} \sim \mathcal{N}_{m}(0,V_{t}) , $$
+$$  w_{t} \sim \mathcal{N}_{p}(0,W_{t})  $$
+
+Los DLM poseen dos supuestos, la linealidad y el supuesto de distribuciones Gaussianas. @petrisDLM señala que este último supuesto puede ser justificado mediante argumentos del teorema del límite central.
+
+La estimación y pronóstico se pueden resolver calculando las distribuciones condicionales de las cantidades de interés, dada la información disponible. Para estimar el vector de estados es necesario computar la densidad condicional $p(\theta_{t} |y_{1}, .., y_{t})$. En particular, nos interesa el problema de filtrado (cuando $s=t$), donde los datos se supone que llegan secuencialmente en el tiempo.
+
+En general, el problema de pronóstico de $k$-pasos hacia adelante consiste en estimar la evolución del sistema $\theta_{t+k}$ para $k \geq 1 $ y realizar un pronóstico de $k$-pasos para $Y_{t+k}$.
+
+Según @petrisDLM en los DLM, el filtro de Kalman proporciona las fórmulas para actualizar nuestra inferencia actual sobre el vector de estado conforme se disponga de nuevos datos. 
+
+Para un DLM, si se cumple que:
+
+$$ \theta_{t} | \mathcal{D}_{t} \sim \mathcal{N}(m_{t}, C_{t}) , t \geq 1 $$
+
+Se tiene que:
+
+La densidad de predicción de estado de k-pasos con  $k \geq 1  $ hacia adelante de $\theta_{t+k} $ dada  la información pasada $D_{t}$, es Gaussiana  con media y varianza condicional dadas respectivamente por:
+
+$$  a_{t+k} = G_{t+k}m_{t} $$
+$$ R_{t+k}= G_{t+k}C_{t+k}G^{'}_{t+k} + W_{t+k} $$
+
+La densidad de predicción de k-pasos con  $k \geq 1  $ hacia adelante de $Y_{t+k} $ dada  la información pasada $D_{t}$, es Gaussiana  con media y varianza condicional dadas respectivamente por:
+
+$$  f_{t+k} = F_{t+k}a_{t+k} $$
+$$ Q_{t+k}= F_{t+k}R_{t+k}F^{'}_{t+k} + V_{t+k} $$
+
+La densidad de filtrado de  $\theta_{t+k} $  con  $k \geq 1 $ dada la información pasada $D_{t+k}$, es Gaussiana  con media y varianza condicional dadas respectivamente por: 
+
+
+$$  m_{t+k} = a_{t+k} + R_{t+k}F^{'}_{t+k}Q^{-1}_{t+k}e_{t+k} $$
+$$ C_{t+k}=R_{t+k} - R_{t+k}F^{'}_{t+k}Q^{-1}_{t+k}F_{t+k}R_{t+k}  $$
+
+## Propuesta y justificación modelos DLM
+
+Como se mencionó en  @fig-defunciones_ano , la cantidad de defunciones totales siguen una cierta tendencia lineal creciente, en particular para años posteriores a 1980.
+
+Debido a que esta es nuestra variable de interés para realizar un pronóstico, es propicio para nuestro estudio en cuestión la implementación de un modelo con supuesto de linealidad, como se mencionó justamente los DLM siguen este supuesto.
+
+Para llevar a cabo los pronósticos se proponen por tanto tres métodos estadísticos pertenecientes a los DLM, estos son: modelo DLM polinomial de primer orden, modelo DLM polinomial de segundo orden y el modelo ARIMA.
+
+Se propone un modelo DLM de primer orden ya que como establece @optimalDLM los DLM de primer orden son algoritmos recomendados al lidiar con datos anuales debido a que las series de tiempo es corta y no presentan patrones estacionales.Dado que nuestros datos son anuales, este modelo se presenta como un posible candidato.
+
+Por su parte @optimalDLM, señala que los DLM de segundo orden son útiles para describir tendencias. Dada la tendencia observada de la serie de defunciones totales sugiere por tanto realizar un modelo  polinomial de segundo orden.
+
+
+ # Primera implementación
+
+Como una primer implementación se utilizará un modelo ARIMA. Tal como lo menciona @petrisDLM un modelo ARIMA puede ser considerado un DLM, esto ya que es posible representar todo modelo ARIMA (ya sea univariado o mulltivariado) como un DLM. 
+
+La escogencia de este modelo al ser un DLM, sigue la misma línea de justificación antes mencionado sobre la elección de modelos DLM para nuestro estudio, siendo este un caso particular de estos.
+
+Sin embargo, es importante mencionar que la escogencia de este modelo como primera implementación también se basa en su simplicidad, y en que dada la bibliografía consultada, se observa que en múltiples investigaciones con temáticas relacionadas a nuestro estudio como el de  @adekambi  y el estudio por @ordorika , se implementa este tipo de modelo.
+   
+No obstante, según @petrisDLM estos modelos proporcionan un enfoque de caja negra para el análisis de datos, ofreciendo la posibilidad de predecir observaciones futuras, pero con una interpretabilidad muy limitada del modelo ajustado.
+
+Por lo que para bitácoras posteriores se describirán en detalle e implementaran dos modelos de mayor complejidad pero con una mejor interpretabilidad, como lo son los DLM  polinomiales de primer y segundo orden, antes mencionados.
+
+
+
+
+
+
 
