@@ -15,6 +15,12 @@ library(cowplot)
 library(viridis)
 library(GGally)
 library(scales)
+
+
+#Paquetes para series de tiempo
+library(astsa)
+library(tseries)
+library(forecast)
 ```
 
 
@@ -427,8 +433,116 @@ No obstante, según @petrisDLM estos modelos proporcionan un enfoque de caja neg
 Por lo que para bitácoras posteriores se describirán en detalle e implementaran dos modelos de mayor complejidad pero con una mejor interpretabilidad, como lo son los DLM  polinomiales de primer y segundo orden, antes mencionados.
 
 
+En cuanto a la implementación del primer intento utilizando ARIMA, como se quiere hacer una comparación entre los modelos, se usará una base de entrenamiento y una de prueba para hacer el diagnóstico y cuyos valores ya son conocido para poder valorar la eficacia de dicho modelo. Se quiere hacer el pronóstico a dos años, por lo que la base entrenamiento será los datos entre 1950 y 2018, y se pronosticará las defunciones totales para el 2019 y 2020. 
+
+```{r}
+entrenamiento <- base$defunciones[1:69]
+serie <- ts( entrenamiento, start=c(1950,1), frequency=1)
+```
+
+Primero, se grafica la serie de tiempo de defunciones totales. Para emplear el modelo se requiere estacionareidad.
+
+```{r}
+#| fig-cap: "Serie de tiempo de defunciones totales"
+#| label: fig-serieDefunciones
+#| fig-cap-location: top
+#| echo: false
+plot(serie)
+```
+
+
+```{r}
+#| fig-cap: "ACF y PACF de la serie de defunciones totales"
+#| label: fig-ACFDefunciones
+#| fig-cap-location: top
+#| echo: false
+acf2(serie, main="")
+```
+
+Se observa de la @fig-serieDefunciones no estacionareidad muy clara, además de que la decadencia de las correlaciones no son suficientemente rápidas. Se lleva a cabo una diferenciación 
+
+```{r}
+#| fig-cap: "Serie de tiempo de defunciones totales con una diferencia"
+#| label: fig-serieDefuncionesdif
+#| fig-cap-location: top
+#| echo: false
+seriedif <- diff(serie)
+plot(seriedif)
+```
+
+
+```{r}
+#| fig-cap: "ACF y PACF de la serie de defunciones totales con una diferencia"
+#| label: fig-ACFDefuncionesdif
+#| fig-cap-location: top
+#| echo: false
+acf2(seriedif)
+```
+
+Se observa de la @fig-serieDefuncionesdif que aún hay evidencia de no estacionareidad por lo que se lleva a cabo una segunda diferenciación
+
+```{r}
+#| fig-cap: "Serie de tiempo de defunciones totales con dos diferencias"
+#| label: fig-serieDefuncionesdif2
+#| fig-cap-location: top
+#| echo: false
+seriedif2 <- diff(serie, differences = 2)
+plot(seriedif2)
+```
+
+
+```{r}
+#| fig-cap: "ACF y PACF de la serie de defunciones totales con dos diferencias"
+#| label: fig-ACFDefuncionesdif2
+#| fig-cap-location: top
+#| echo: false
+acf2(seriedif2)
+```
+
+En la @fig-serieDefuncionesdif2 se aprecia que con dos diferencias ya se logra estacionareidad. Además, de la @fig-ACFDefuncionesdif2 se nota que tiene una decadencia gradual en las correlaciones y las autocorrelaciones parciales luego del primer rezago por lo que implica un modelo ARMA(1,1). Se lleva a cabo la implementación de este modelo con dos rezagos. 
+
+```{r}
+modelo <- arima(serie, order=c(1, 2, 1))
+```
+
+y se presentan algunos diagnósticos. 
+
+```{r}
+#| fig-cap: "Diagnósticos del modelo ARIMA implementado"
+#| label: fig-diagARIMA
+#| fig-cap-location: top
+#| echo: false
+par(mar=c(2,2,2,2))
+tsdiag(modelo)
+```
 
 
 
+En la @fig-diagARIMA se aprecia que los residuos no parecen mostrar ningún patrón significante y la varianza aparenta ser constante. El gráfico de ACF confirma que no existe correlación en los residuos. En el último gráfico se muestra que bajo la prueba de Ljung-Box en cada rezago se encuentra evidencia estadística de bondad de ajuste del modelo seleccionado. Finalmente, con este modelo se lleva a cabo el diagnóstico a dos años. 
 
 
+```{r}
+#| fig-cap: "Pronóstico a dos años utilizando el modelo ARIMA"
+#| label: fig-pronARIMA
+#| fig-cap-location: top
+#| echo: false
+pronostico <- forecast(modelo, h=2)
+plot(pronostico)
+```
+```{r}
+#| tbl-cap: "Pronóstico e intervalos de confianza del modelo ARIMa"
+#| label: tbl-proARIMA
+#| tbl-pos: 'h'
+#| echo: false
+pronostico %>% kbl() %>%
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(full_width = F)%>%kable_classic_2() %>% row_spec(0,bold=TRUE)
+```
+
+La @tbl-proARIMA resumen los pronósticos e intervalos de confianzo utilizando el modelo ARIMA que se pueden comparar con los valores reales de 24292 para el 2019 y 26209 para el 2020. Es importante recordar que el 2020 fue anómalo por ser el primer año del COVID-19 en Costa Rica lo que ocasionó más muertes. Áún así se aprecia que para ambos años se obtuvieron valores que caen dentro del intervalod de confianza 95%. La diferencia entre el pronóstico y el valor real en valor absoluto es dado por 
+
+```{r}
+#| echo: false
+abs(pronostico$mean[1]-base$defunciones[70])
+abs(pronostico$mean[2]-base$defunciones[71])
+```
