@@ -140,7 +140,7 @@ En la @fig-def_inf_neonat_fet_ano se comparan las defunciones infantiles, neonat
 de la salud, ayudados por una extraordinaria reducción de la natalidad que permite un mejor desarrollo intrauterino, mejor cuidado del niño y reduce el riesgo de contagio" [-@rosero2004situacion]. El mismo autor menciona que "el riesgo de morir de los menores de un
 año ha disminuido en forma poco menos que espectacular entre 1970-78, pues ha sido
 reducido a la tercera parte (de 62 a 22 muertes por cada mil nacimientos) en un lapso
-de apenas 8 años" [@rosero2016situacion]. Por su parte, la cantidad de defunciones neonatales superó a las fetales desde mediados de los años cincuenta y hasta mediados de los años 85, donde se pierde un poco la noción de cuál suele ser mayor.
+de apenas 8 años" [@rosero2016situacion]. Por su parte, la cantidad de defunciones neonatales superó a las fetales desde mediados de los años cincuenta y hasta mediados de los años ochenta, donde se pierde un poco la noción de cuál suele ser mayor.
 
 ```{r, echo=FALSE}
 #| fig-cap: "Defunciones infantiles, neonatales y fetales por año"
