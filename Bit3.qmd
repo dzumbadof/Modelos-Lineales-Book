@@ -1,6 +1,5 @@
 # Bitacora 3
 
-## Continuación del análisis descriptivo
 
 
 ```{r, R.options, echo=F, include=F, warning=F, message=F}
@@ -52,6 +51,21 @@ base <- base %>% clean_names()
 
  
 ```
+
+## Distribución de la variable cuantitativa
+
+```{r}
+#| fig-cap: "Histograma de las defunciones totales entre 1950 y 2020"
+#| label: fig-histdefunciones
+#| fig-cap-location: top
+#| echo: false
+hist(base$defunciones, main="", xlab = 'Defunciones totales', 
+     ylab='Frecuencia', col='#8494FF')
+```
+La @fig-histdefunciones muestra la distribución de la variable cuantitativa de defunciones totales anuales, la cual es de principal interés en este trabajo. Se muestra poca simetría y una acumulación muy marcada en los cantidades más pequeñas, lo que quiere decir que la mayoría de años registrados presentaron defunciones totales de menos de 1500 al año. 
+
+
+## Continuación del análisis descriptivo
 
 En la @fig-defunciones_ano se muestra la cantidad total de defunciones para el periodo 1950-2020. Destaca una tendencia creciente muy marcada a partir de cerca de 1980 y hasta el final del periodo considerado. 
 
