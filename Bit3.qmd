@@ -65,7 +65,7 @@ hist(base$defunciones, main="", xlab = 'Defunciones totales',
 La @fig-histdefunciones muestra la distribución de la variable cuantitativa de defunciones totales anuales, la cual es de principal interés en este trabajo. Se muestra poca simetría y una acumulación muy marcada en los cantidades más pequeñas, lo que quiere decir que la mayoría de años registrados presentaron defunciones totales de menos de 1500 al año. 
 
 
-## Continuación del análisis descriptivo
+## Asoaciación de variables
 
 En la @fig-defunciones_ano se muestra la cantidad total de defunciones para el periodo 1950-2020. Destaca una tendencia creciente muy marcada a partir de cerca de 1980 y hasta el final del periodo considerado. 
 
@@ -89,8 +89,6 @@ g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
 g
 ```
 
-Este mismo comportamiento se puede observar en la tasa de mortalidad en la @fig-tasa_mort_ano aunque de una forma mucho menos pronunciada, además, se puede apreciar que para el periodo 1950-1980 esta tasa decreció considerablemente.
-
 ```{r, echo=FALSE}
 #| fig-cap: "Tasa de mortalidad por año para el periodo 1950-2020"
 #| label: fig-tasa_mort_ano
@@ -113,7 +111,7 @@ g <- g + scale_color_brewer(palette = "Pastel2", )
 g
 ```
 
-Por su parte, en la @fig-poblaciones_ano se identifica una clara tendencia creciente de la población durante todo el periodo considerado.
+Este mismo comportamiento se puede observar en la tasa de mortalidad en la @fig-tasa_mort_ano aunque de una forma mucho menos pronunciada, además, se puede apreciar que para el periodo 1950-1980 esta tasa decreció considerablemente.
 
 ```{r, echo=FALSE}
 #| fig-cap: "Población total por año para el periodo 1950-2020"
@@ -134,6 +132,7 @@ g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
 g
 ```
 
+Por su parte, en la @fig-poblaciones_ano se identifica una clara tendencia creciente de la población durante todo el periodo considerado.
 
 Asimismo, de la @fig-nacimientos_ano se observa que la cantidad de nacimientos tuvo una tendencia creciente desde el inicio del periodo hasta cerca de 1990, en que empieza a descender hasta el último año considerado.
 
@@ -233,10 +232,7 @@ g
 
 ```
 
-Para analizar la asociación de la tasa de mortalidad con la de crecimiento, se crea una variable categórica que indica si entre periodos consecutivos hubo coincidencia en la monotonía de ambas tasas, esto es, la variable es verdadera si ambas decrecieron o subieron, y es falsa si esto no se cumplió. En las figuras @fig-hist-coinc-mort-crec se muestra el histograma de esta variable, donde se ve que fue más común la no coincidencia en el comportamiento de las tasas entre periodos consecutivos. En la @fig-dist-ano-mort-crec se muestra la distribución de los años según la coincidencia en la monotonía de la tasa de mortalidad y la de crecimiento y se ve que esta fue relativamente uniforme. Hacia 2016, se afirmaba que "la actual tasa de mortalidad general de Costa Rica (4 muertes anuales por cada mil habitantes) es una de las más bajas del mundo, inferior
-incluso a la de los superdesarrollados países de la Europa Noroccidental (11 por mil) [...] esta situación tan favorable se debe, en parte, a una estructura por edades muy
-particular de la población costarricense, caracterizada por una alta concentración en las
-edades donde la mortalidad es más baja (adultos jóvenes)" [@rosero2016situacion].
+Para analizar la asociación de la tasa de mortalidad con la de crecimiento, se crea una variable categórica que indica si entre periodos consecutivos hubo coincidencia en la monotonía de ambas tasas, esto es, la variable es verdadera si ambas decrecieron o subieron, y es falsa si esto no se cumplió. En las figuras @fig-hist-coinc-mort-crec se muestra el histograma de esta variable, donde se ve que fue más común la no coincidencia en el comportamiento de las tasas entre periodos consecutivos. 
 
 ```{r, echo=FALSE}
 #| fig-cap: "Histograma de la coincidencia en la monotonía de la tasa de mortalidad y la de crecimiento"
@@ -248,7 +244,7 @@ g <- ggplot(datos %>% na.omit()) +
 geom_bar(aes(crecimiento_defunciones, fill =crecimiento_defunciones), show.legend = FALSE)
 
 g <- g + scale_x_discrete(labels = c("Falso", "Verdadero"))
-g <- g + scale_y_continuous(breaks = seq(0,40,5), limits = c(0,40))
+g <- g + scale_y_continuous(breaks = seq(0,35,5), limits = c(0,35))
 
 g <- g + labs(x = "Coincidencia en la monotonía",
               y = "Conteo",
@@ -257,6 +253,11 @@ g <- g + theme_cowplot()
 g <- g + scale_fill_brewer(palette = "PuBuGn")
 g
 ```
+
+En la @fig-dist-ano-mort-crec se muestra la distribución de los años según la coincidencia en la monotonía de la tasa de mortalidad y la de crecimiento y se ve que esta fue relativamente uniforme. Hacia 2016, se afirmaba que "la actual tasa de mortalidad general de Costa Rica (4 muertes anuales por cada mil habitantes) es una de las más bajas del mundo, inferior
+incluso a la de los superdesarrollados países de la Europa Noroccidental (11 por mil) [...] esta situación tan favorable se debe, en parte, a una estructura por edades muy
+particular de la población costarricense, caracterizada por una alta concentración en las
+edades donde la mortalidad es más baja (adultos jóvenes)" [@rosero2016situacion].
 
 
 ```{r, echo=FALSE}
@@ -280,8 +281,8 @@ g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
 g
 
 ```
+Se realiza el mismo ejercicio con la población total y las defunciones totales, lo que resulta en el histograma en la @fig-hist-coinc-pob-def y la distribución de los años en la @fig-dist-ano-pob-def.
 
-Se realiza el mismo ejercicio con la población total y las defunciones totales, lo que resulta en el histograma en la @fig-hist-coinc-pob-def y la distribución de los años en la @fig-dist-ano-pob-def. De la primera se ve que fue más común la coincidencia en este caso, y de la segunda que es relativamente marcado que la coincidencia fue falsa de mediados de los años ochenta para atrás, y fue más común que la coincidencia se diera desde cerca de 1980. Nuevamente, se haya evidencia descriptiva de que en la década de los ochenta hay algún tipo de cambio, lo que debe tenerse en cuenta en la sección metodológica, quizás restringiendo el periodo de estudio. 
 
 ```{r, echo=FALSE}
 #| fig-cap: "Histograma de la coincidencia en la monotonía de la población total y las defunciones totales"
@@ -293,7 +294,7 @@ g <- ggplot(datos %>% na.omit()) +
 geom_bar(aes(poblacion_total_defunciones, fill =poblacion_total_defunciones), show.legend = FALSE)
 
 g <- g + scale_x_discrete(labels = c("Falso", "Verdadero"))
-
+g <- g + scale_y_continuous(breaks = seq(0,40,5), limits = c(0,40))
 g <- g + labs(x = "Coincidencia en la monotonía",
               y = "Conteo",
               caption = "Fuente: Elaboración propia con datos del INEC")
@@ -301,6 +302,8 @@ g <- g + theme_cowplot()
 g <- g + scale_fill_brewer(palette = "PuBuGn")
 g
 ```
+
+De la primera se ve que fue más común la coincidencia en este caso, y de la segunda que es relativamente marcado que la coincidencia fue falsa de mediados de los años ochenta para atrás, y fue más común que la coincidencia se diera desde cerca de 1980. Nuevamente, se haya evidencia descriptiva de que en la década de los ochenta hay algún tipo de cambio, lo que debe tenerse en cuenta en la sección metodológica, quizás restringiendo el periodo de estudio. 
 
 ```{r, echo=FALSE}
 #| fig-cap: "Distribución de los años según la coincidencia en la monotonía de la población total y la cantidad de defunciones"
@@ -324,8 +327,8 @@ g
 
 ```
 
-Se vuelve a proceder de la msima manera, esta vez con las defunciones infantiles y las defunciones totales, lo que resulta en el histograma en la @fig-hist-coinc-infant-def y la distribución de los años en la @fig-dist-ano-infant-def. En este caso, los conteos están más parejos pero ocurrió más que sí se diera la coincidencia. Además, de las distribuciones se aprecia que la discordancia se dio cerca de 1980 hasta el final, mientras que la coincidencia ocurrió sobre todo en años anteriores a 1990. De nuevo, 1980 parece ser un punto de corte pertinente pues aparenta marcar un cambio en el comportamiento de las defunciones totales.
 
+Se vuelve a proceder de la misma manera, esta vez con las defunciones infantiles y las defunciones totales, lo que resulta en el histograma en la @fig-hist-coinc-infant-def y la distribución de los años en la @fig-dist-ano-infant-def.
 
 ```{r, echo=FALSE}
 #| fig-cap: "Histograma de la coincidencia en la monotonía de las defunciones infantiles y las defunciones totales"
@@ -338,7 +341,7 @@ g <- ggplot(datos %>% na.omit()) +
 geom_bar(aes(def_infantiles_defunciones, fill = def_infantiles_defunciones), show.legend = FALSE)
 
 g <- g + scale_x_discrete(labels = c("Falso", "Verdadero"))
-g <- g + scale_y_continuous(breaks = seq(0,40,5), limits = c(0,40))
+g <- g + scale_y_continuous(breaks = seq(0,35,5), limits = c(0,35))
 
 g <- g + labs(x = "Coincidencia en la monotonía",
               y = "Conteo",
@@ -347,6 +350,8 @@ g <- g + theme_cowplot()
 g <- g + scale_fill_brewer(palette = "PuBuGn")
 g
 ```
+
+En este caso, los conteos están más parejos pero ocurrió más que sí se diera la coincidencia. 
 
 ```{r, echo=FALSE}
 #| fig-cap: "Distribución de los años según la coincidencia en la monotonía de las defunciones infantiles y la cantidad de defunciones"
@@ -369,7 +374,7 @@ g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
 g
 
 ```
-
+Además, de las distribuciones se aprecia que la discordancia se dio cerca de 1980 hasta el final, mientras que la coincidencia ocurrió sobre todo en años anteriores a 1990. De nuevo, 1980 parece ser un punto de corte pertinente pues aparenta marcar un cambio en el comportamiento de las defunciones totales.
 
 ## Descripción del modelo o metodología
 
@@ -544,7 +549,7 @@ pronostico <- forecast(modelo, h=2)
 plot(pronostico)
 ```
 ```{r}
-#| tbl-cap: "Pronóstico e intervalos de confianza del modelo ARIMa"
+#| tbl-cap: "Pronóstico e intervalos de confianza del modelo ARIMA"
 #| label: tbl-proARIMA
 #| tbl-pos: 'h'
 #| echo: false
