@@ -1,8 +1,357 @@
 # Bitacora 3
 
+## Continuación del análisis descriptivo
 
 
-# Descripción del modelo o metodología
+```{r, R.options, echo=F, include=F, warning=F, message=F}
+options(knitr.kable.NA = '-', echo = F)
+library(readxl)
+library(kableExtra)
+library(dplyr)
+library(janitor)
+library(ggplot2)
+library(wesanderson)
+library(cowplot)
+library(viridis)
+library(GGally)
+library(scales)
+```
+
+
+```{r, echo=F, include=F}
+base <- data.frame(read_excel("sepoblacev1950-2020_0.xls", 
+    range = "B9:S80", col_types = "numeric"))
+
+colnames(base) <- c("Año",
+                    "Población total",
+                    "Población de hombres",
+                    "Población de mujeres",
+                    "Nacimientos",
+                    "Defunciones",
+                    "Defunciones infantiles",
+                    "Defunciones neonatales",
+                    "Defunciones fetales",
+                    "Tasa de crecimiento",
+                    "Tasa de natalidad",
+                    "Tasa de mortalidad",
+                    "Tasa de mortalidad infantil",
+                    "Tasa de mortalidad neonatal",
+                    "Tasa de mortalidad fetal",
+                    "Tasa global de fecundidad",
+                    "Tasa bruta de reproducción",
+                    "Tasa neta de reproducción"				
+)
+
+base <- base %>% clean_names()
+
+ 
+```
+
+En la @fig-defunciones_ano se muestra la cantidad total de defunciones para el periodo 1950-2020. Destaca una tendencia creciente muy marcada a partir de cerca de 1980 y hasta el final del periodo considerado. 
+
+```{r, echo=FALSE}
+#| fig-cap: "Cantidad de defunciones por año para el periodo 1950-2020"
+#| label: fig-defunciones_ano
+#| fig-cap-location: top
+g <- ggplot(base, aes(x=ano, y=defunciones))
+g <- g + geom_point(size = 0.8)
+g <- g + geom_smooth(formula = y~x, method = "loess", se = F)
+g <- g + scale_x_continuous(breaks = seq(1950,2020,5))
+g <- g + scale_y_continuous(breaks = seq(5000, 27000, 5000), limits = c(5000,27000))
+g <- g + labs(x = "Año",
+              y = "Cantidad de defunciones",
+              caption = "Fuente: Elaboración propia")
+
+g <- g + theme_cowplot() 
+
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+
+g
+```
+
+Este mismo comportamiento se puede observar en la tasa de mortalidad en la @fig-tasa_mort_ano aunque de una forma mucho menos pronunciada, además, se puede apreciar que para el periodo 1950-1980 esta tasa decreció considerablemente.
+
+```{r, echo=FALSE}
+#| fig-cap: "Tasa de mortalidad por año para el periodo 1950-2020"
+#| label: fig-tasa_mort_ano
+#| fig-cap-location: top
+g <- ggplot(base, aes(x=ano, y=tasa_de_mortalidad))
+g <- g + geom_point(size = 0.8)
+
+g <- g + geom_smooth(formula = y~x, method = "loess", se = F)
+g <- g + scale_x_continuous(breaks = seq(1950,2020,5))
+g <- g + scale_y_continuous(breaks = seq(3,12,1), limits = c(3,12))
+g <- g + labs(x = "Año",
+              y = "Tasa de mortalidad",
+              caption = "Fuente: Elaboración propia")
+g <- g + theme_cowplot() 
+
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+
+g <- g + scale_color_brewer(palette = "Pastel2", )
+
+g
+```
+
+Por su parte, en la @fig-poblaciones_ano se identifica una clara tendencia creciente de la población durante todo el periodo considerado.
+
+```{r, echo=FALSE}
+#| fig-cap: "Población total por año para el periodo 1950-2020"
+#| label: fig-poblaciones_ano
+#| fig-cap-location: top
+g <- ggplot(base, aes(x=ano, y=poblacion_total))
+g <- g + geom_point(size = 0.8)
+g <- g + geom_smooth(formula = y~x, method = "loess", se = F)
+g <- g + scale_x_continuous(breaks = seq(1950,2020,5))
+g <- g + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) # millions
+g <- g + labs(x = "Año",
+              y = "Población total (en millones)",
+              caption = "Fuente: Elaboración propia")
+g <- g + theme_cowplot() 
+
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+
+g
+```
+
+
+Asimismo, de la @fig-nacimientos_ano se observa que la cantidad de nacimientos tuvo una tendencia creciente desde el inicio del periodo hasta cerca de 1990, en que empieza a descender hasta el último año considerado.
+
+```{r, echo=FALSE}
+#| fig-cap: "Cantidad de nacimientos por año para el periodo 1950-2020"
+#| label: fig-nacimientos_ano
+#| fig-cap-location: top
+g <- ggplot(base, aes(x=ano, y=nacimientos))
+g <- g + geom_point(size = 0.8)
+g <- g + geom_smooth(formula = y~x, method = "loess", se = F)
+g <- g + scale_x_continuous(breaks = seq(1950,2020,5))
+# g <- g + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) # millions
+g <- g + labs(x = "Año",
+              y = "Cantidad de nacimientos",
+              caption = "Fuente: Elaboración propia")
+g <- g + theme_cowplot() 
+
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+
+g
+```
+
+En la @fig-def_inf_neonat_fet_ano se comparan las defunciones infantiles, neonatales y fetales. Cabe añadir que la distancia verticar entre las defunciones infantiles y las neonatales resulta en las llamadas defunciones posneonatales, es decir, las que ocurren a partir de los 29 días de edad y hasta un año. Se advierte que a mediados de los años sesenta la cantidad de defunciones infantiles aparenta tener una tendencia decreciente. Al respecto, Rosero Bixby afirma que la caída más dramática en los años setenta "se logra gracias a los programas de atención primaria
+de la salud, ayudados por una extraordinaria reducción de la natalidad que permite un mejor desarrollo intrauterino, mejor cuidado del niño y reduce el riesgo de contagio" [-@rosero2004situacion]. El mismo autor menciona que "el riesgo de morir de los menores de un
+año ha disminuido en forma poco menos que espectacular entre 1970-78, pues ha sido
+reducido a la tercera parte (de 62 a 22 muertes por cada mil nacimientos) en un lapso
+de apenas 8 años" [@rosero2016situacion]. Por su parte, la cantidad de defunciones neonatales superó a las fetales desde mediados de los años cincuenta y hasta mediados de los años 85, donde se pierde un poco la noción de cuál suele ser mayor.
+
+```{r, echo=FALSE}
+#| fig-cap: "Defunciones infantiles, neonatales y fetales por año"
+#| label: fig-def_inf_neonat_fet_ano
+#| fig-cap-location: top
+g <- ggplot(base)
+g <- g + geom_line(aes(x=ano, y=defunciones_infantiles, color="Infantil"), lwd=1)
+g <- g + geom_line(aes(x=ano, y=defunciones_neonatales, color="Neonatal"), lwd=1)
+g <- g + geom_line(aes(x=ano, y=defunciones_fetales, color="Fetal"), lwd=1)
+g <- g + scale_x_continuous(breaks = seq(1950,2020,5))
+g <- g + labs(x = "Año",
+              y = "Cantidad de defunciones",
+              caption = "Fuente: Elaboración propia con datos del INEC",
+              color="Tipo de defunción")
+g <- g + theme_cowplot() 
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+g <- g + scale_color_brewer(palette = "PuBuGn")
+g
+
+
+```
+
+Para estudiar la asociación entre la tasa de defunciones neonatales y la de defunciones fetales, se crea una variable categórica indicadora de si la primera es mayor a la segunda. Dado que ambas tasas se calculan respecto al mismo denominador (la cantidad de nacimientos), esta variable equivale a hacer los mismo con la cantidad de defunciones respectiva. En la @fig-indicadora_neonat_fet se muestra la distribución de esta variable y se ve que en 15 de los 71 años considerados la tasa de mortalidad fetal fue mayor, donde de la @fig-def_inf_neonat_fet_ano se sabe que esto sucedió mayoritariamente entre 1985 y 2020. En consecuencia, en 56 años fue mayor la tasa de mortalidad neonatal, lo cuál sucede sobre todo en los primeros 35 años a partir de 1950. Entonces, en los 71 años de estudio, 78.87% de las ocasiones fue mayor la tasa de mortalidad neonatal, contra un 21.13% de la fetal.
+
+```{r, echo=FALSE}
+#| fig-cap: "Distribución variable indicadora de la mayor tasa entre las de mortalidad fetal y la neonatal"
+#| label: fig-indicadora_neonat_fet
+#| fig-cap-location: top
+
+# Se crea variable que indica si la tasa de mortalidad neonatal es mayor a la fetal
+datos <- base %>% mutate(indicadora = as.factor(tasa_de_mortalidad_neonatal>tasa_de_mortalidad_fetal))
+
+g <- ggplot(datos) +
+geom_bar(aes(indicadora, fill = indicadora), show.legend = FALSE)
+
+g <- g + scale_x_discrete(labels = c("Fetal", "Neonatal"))
+g <- g + scale_y_continuous(breaks = seq(0,60,5), limits = c(0,60))
+
+g <- g + labs(x = "Tasa de mortalidad mayor",
+              y = "Conteo",
+              caption = "Fuente: Elaboración propia con datos del INEC",
+              color="Tipo de tasa")
+g <- g + theme_cowplot() 
+g <- g + scale_fill_brewer(palette = "PuBuGn")
+g
+
+```
+
+Debido a que, por razones de escala, la cantidad de defunciones, nacimientos y población total resultan difíciles de comparar gráficamente, una alternativa se muestra en la @fig-tasa_crec_nat_ano, donde se muestran las tasas de crecimiento, mortalidad y natalidad por año. Se identifica la gran similitud en el comportamiento de las tasas de crecimiento y natalidad, lo cuál no es ninguna sorpresa pues la segunda es una componente aditiva de la primera. Ahora bien, este gráfico permite apreciar que desde mediados del siglo XX y hasta cerca de 1980, tanto la tasa de crecimiento como  la de mortalidad aparentan haber tenido una tendencia a la baja, lo cuál se rompe cerca de dicho año y la tasa de mortalidad empieza a empinarse ligeramente, mientras que la de crecimiento continúa en su tenencia con su tendencia decreciente. Nuevamente, se ve que el año 1980 parece haber un cambio en el comportamiento demográfico del país. 
+
+```{r, echo=FALSE}
+#| fig-cap: "Tasas de crecimiento, mortalidad y natalidad por año"
+#| label: fig-tasa_crec_nat_ano
+#| fig-cap-location: top
+g <- ggplot(base)
+g <- g + geom_line(aes(x=ano, y=tasa_de_crecimiento, color="Crecimiento"), lwd=1)
+g <- g + geom_line(aes(x=ano, y=tasa_de_natalidad, color="Natalidad"), lwd=1)
+g <- g + geom_line(aes(x=ano, y=tasa_de_mortalidad, color="Mortalidad"), lwd=1)
+# g <- g + geom_line(aes(x=ano, y=tasa_de_mortalidad, color="Mortalidad"), lwd=1)
+g <- g + scale_x_continuous(breaks = seq(1950,2020,5))
+g <- g + labs(x = "Año",
+              y = "Valor de la tasa",
+              caption = "Fuente: Elaboración propia con datos del INEC",
+              color="Tipo de tasa")
+g <- g + theme_cowplot() 
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+g <- g + scale_color_brewer(palette = "PuBuGn")
+g
+
+
+```
+
+Para analizar la asociación de la tasa de mortalidad con la de crecimiento, se crea una variable categórica que indica si entre periodos consecutivos hubo coincidencia en la monotonía de ambas tasas, esto es, la variable es verdadera si ambas decrecieron o subieron, y es falsa si esto no se cumplió. En las figuras @fig-hist-coinc-mort-crec se muestra el histograma de esta variable, donde se ve que fue más común la no coincidencia en el comportamiento de las tasas entre periodos consecutivos. En la @fig-dist-ano-mort-crec se muestra la distribución de los años según la coincidencia en la monotonía de la tasa de mortalidad y la de crecimiento y se ve que esta fue relativamente uniforme. Hacia 2016, se afirmaba que "la actual tasa de mortalidad general de Costa Rica (4 muertes anuales por cada mil habitantes) es una de las más bajas del mundo, inferior
+incluso a la de los superdesarrollados países de la Europa Noroccidental (11 por mil) [...] esta situación tan favorable se debe, en parte, a una estructura por edades muy
+particular de la población costarricense, caracterizada por una alta concentración en las
+edades donde la mortalidad es más baja (adultos jóvenes)" [@rosero2016situacion].
+
+```{r, echo=FALSE}
+#| fig-cap: "Histograma de la coincidencia en la monotonía de la tasa de mortalidad y la de crecimiento"
+#| label: fig-hist-coinc-mort-crec
+#| fig-cap-location: top
+datos <- datos %>% mutate(crecimiento_defunciones= c(NA, sign(diff(tasa_de_crecimiento))==sign(diff(tasa_de_mortalidad))))
+ 
+g <- ggplot(datos %>% na.omit()) +
+geom_bar(aes(crecimiento_defunciones, fill =crecimiento_defunciones), show.legend = FALSE)
+
+g <- g + scale_x_discrete(labels = c("Falso", "Verdadero"))
+g <- g + scale_y_continuous(breaks = seq(0,40,5), limits = c(0,40))
+
+g <- g + labs(x = "Coincidencia en la monotonía",
+              y = "Conteo",
+              caption = "Fuente: Elaboración propia con datos del INEC")
+g <- g + theme_cowplot()
+g <- g + scale_fill_brewer(palette = "PuBuGn")
+g
+```
+
+
+```{r, echo=FALSE}
+#| fig-cap: "Distribución de los años según la coincidencia en la monotonía de la tasa de mortalidad y la de crecimiento"
+#| label: fig-dist-ano-mort-crec
+#| fig-cap-location: top
+
+g <- ggplot(datos %>% na.omit(), aes(x=ano, fill=crecimiento_defunciones)) 
+# g <- g + geom_histogram(aes(y=..density..), position="identity", alpha=0.5)
+g <- g + geom_density(alpha=0.6)
+g <- g + scale_x_continuous(breaks=seq(1950,2020,10),limits=c(1950,2020))
+g <- g + scale_y_continuous(labels = percent, name = "Proporción")
+g <- g + labs(x = "Año",
+              y = "Proporción",
+              caption = "Fuente: Elaboración propia con datos del INEC",
+              fill="Coincidencia en\nla monotonía")
+g <- g + theme_cowplot() 
+g <- g + scale_fill_brewer(palette = "Paired", labels=c("Falso", "Verdadero"))
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+
+g
+
+```
+
+Se realiza el mismo ejercicio con la población total y las defunciones totales, lo que resulta en el histograma en la @fig-hist-coinc-pob-def y la distribución de los años en la @fig-dist-ano-pob-def. De la primera se ve que fue más común la coincidencia en este caso, y de la segunda que es relativamente marcado que la coincidencia fue falsa de mediados de los años ochenta para atrás, y fue más común que la coincidencia se diera desde cerca de 1980. Nuevamente, se haya evidencia descriptiva de que en la década de los ochenta hay algún tipo de cambio, lo que debe tenerse en cuenta en la sección metodológica, quizás restringiendo el periodo de estudio. 
+
+```{r, echo=FALSE}
+#| fig-cap: "Histograma de la coincidencia en la monotonía de la población total y las defunciones totales"
+#| label: fig-hist-coinc-pob-def
+#| fig-cap-location: top
+datos <- datos %>% mutate(poblacion_total_defunciones= c(NA, sign(diff(poblacion_total))==sign(diff(defunciones))))
+ 
+g <- ggplot(datos %>% na.omit()) +
+geom_bar(aes(poblacion_total_defunciones, fill =poblacion_total_defunciones), show.legend = FALSE)
+
+g <- g + scale_x_discrete(labels = c("Falso", "Verdadero"))
+
+g <- g + labs(x = "Coincidencia en la monotonía",
+              y = "Conteo",
+              caption = "Fuente: Elaboración propia con datos del INEC")
+g <- g + theme_cowplot()
+g <- g + scale_fill_brewer(palette = "PuBuGn")
+g
+```
+
+```{r, echo=FALSE}
+#| fig-cap: "Distribución de los años según la coincidencia en la monotonía de la población total y la cantidad de defunciones"
+#| label: fig-dist-ano-pob-def
+#| fig-cap-location: top
+#| 
+g <- ggplot(datos %>% na.omit(), aes(x=ano, fill=poblacion_total_defunciones)) 
+# g <- g + geom_histogram(aes(y=..density..), position="identity", alpha=0.5)
+g <- g + geom_density(alpha=0.6)
+g <- g + scale_x_continuous(breaks=seq(1950,2020,10),limits=c(1950,2020))
+g <- g + scale_y_continuous(labels = percent, name = "Proporción")
+g <- g + labs(x = "Año",
+              y = "Proporción",
+              caption = "Fuente: Elaboración propia con datos del INEC",
+              fill="Coincidencia en\nla monotonía")
+g <- g + theme_cowplot() 
+g <- g + scale_fill_brewer(palette = "Paired", labels=c("Falso", "Verdadero"))
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+
+g
+
+```
+
+Se vuelve a proceder de la msima manera, esta vez con las defunciones infantiles y las defunciones totales, lo que resulta en el histograma en la @fig-hist-coinc-infant-def y la distribución de los años en la @fig-dist-ano-infant-def. En este caso, los conteos están más parejos pero ocurrió más que sí se diera la coincidencia. Además, de las distribuciones se aprecia que la discordancia se dio cerca de 1980 hasta el final, mientras que la coincidencia ocurrió sobre todo en años anteriores a 1990. De nuevo, 1980 parece ser un punto de corte pertinente pues aparenta marcar un cambio en el comportamiento de las defunciones totales.
+
+
+```{r, echo=FALSE}
+#| fig-cap: "Histograma de la coincidencia en la monotonía de las defunciones infantiles y las defunciones totales"
+#| label: fig-hist-coinc-infant-def
+#| fig-cap-location: top
+
+datos <- datos %>% mutate(def_infantiles_defunciones= c(NA, sign(diff(defunciones_infantiles))==sign(diff(defunciones))))
+ 
+g <- ggplot(datos %>% na.omit()) +
+geom_bar(aes(def_infantiles_defunciones, fill = def_infantiles_defunciones), show.legend = FALSE)
+
+g <- g + scale_x_discrete(labels = c("Falso", "Verdadero"))
+g <- g + scale_y_continuous(breaks = seq(0,40,5), limits = c(0,40))
+
+g <- g + labs(x = "Coincidencia en la monotonía",
+              y = "Conteo",
+              caption = "Fuente: Elaboración propia con datos del INEC")
+g <- g + theme_cowplot()
+g <- g + scale_fill_brewer(palette = "PuBuGn")
+g
+```
+
+```{r, echo=FALSE}
+#| fig-cap: "Distribución de los años según la coincidencia en la monotonía de las defunciones infantiles y la cantidad de defunciones"
+#| label: fig-dist-ano-infant-def
+#| fig-cap-location: top
+
+g <- ggplot(datos %>% na.omit(), aes(x=ano, fill=def_infantiles_defunciones)) 
+# g <- g + geom_histogram(aes(y=..density..), position="identity", alpha=0.5)
+g <- g + geom_density(alpha=0.6)
+g <- g + scale_x_continuous(breaks=seq(1950,2020,10),limits=c(1950,2020))
+g <- g + scale_y_continuous(labels = percent, name = "Proporción")
+g <- g + labs(x = "Año",
+              y = "Proporción",
+              caption = "Fuente: Elaboración propia con datos del INEC",
+              fill="Coincidencia en\nla monotonía")
+g <- g + theme_cowplot() 
+g <- g + scale_fill_brewer(palette = "Paired", labels=c("Falso", "Verdadero"))
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+
+g
+
+```
+
+
+## Descripción del modelo o metodología
 
 
 Con la finalidad de realizar un pronóstico de la serie de defunciones totales anuales de Costa Rica, se desea implementar el modelo estadístico que mejor se ajuste a los datos.
@@ -65,7 +414,7 @@ Se propone un modelo DLM de primer orden ya que como establece @optimalDLM los D
 Por su parte @optimalDLM, señala que los DLM de segundo orden son útiles para describir tendencias. Dada la tendencia observada de la serie de defunciones totales sugiere por tanto realizar un modelo  polinomial de segundo orden.
 
 
- ## Primera implementación
+## Primera implementación
 
 Como una primer implementación se utilizará un modelo ARIMA. Tal como lo menciona @petrisDLM un modelo ARIMA puede ser considerado un DLM, esto ya que es posible representar todo modelo ARIMA (ya sea univariado o mulltivariado) como un DLM. 
 
