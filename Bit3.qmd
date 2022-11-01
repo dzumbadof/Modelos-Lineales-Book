@@ -386,14 +386,14 @@ Para nuestro estudio en cuestión, se ha optado por realizar una implementación
 
 Tal como lo establece @petrisDLM, estos últimos son una clase de Modelos de Espacio-Estado también llamados Modelos de Espacio-Estado Lineales Gaussianos. Estos modelos son especificados mediante dos ecuaciones, para $t \geq 1$ se tiene:
 
-$$ Y_{t}= F_{t} \theta_{t} + v_{t} , $$
+$$ Y_{t}= F_{t} \theta_{t} + v_{t}, $$
 $$  \theta_{t}= G_{t} \theta_{t-1} + w_{t}   $$
 
 Donde la primer ecuación es llamada ecuación de observación, y la segunda ecuación estado o ecuación del sistema.
 
-Es importante señalar que $F_{t}$ y $G_{t}$ son matrices y $(v_{t})$ , $(w_{t})$ son secuencias de ruidos blancos independientes tales que:
+Es importante señalar que $F_{t}$ y $G_{t}$ son matrices y $(v_{t})$, $(w_{t})$ son secuencias de ruidos blancos independientes tales que:
 
-$$ v_{t} \sim \mathcal{N}_{m}(0,V_{t}) , $$
+$$ v_{t} \sim \mathcal{N}_{m}(0,V_{t}), $$
 $$  w_{t} \sim \mathcal{N}_{p}(0,W_{t})  $$
 
 Los DLM poseen dos supuestos, la linealidad y el supuesto de distribuciones Gaussianas. @petrisDLM señala que este último supuesto puede ser justificado mediante argumentos del teorema del límite central.
@@ -406,7 +406,7 @@ Según @petrisDLM en los DLM, el filtro de Kalman proporciona las fórmulas para
 
 Para un DLM, si se cumple que:
 
-$$ \theta_{t} | \mathcal{D}_{t} \sim \mathcal{N}(m_{t}, C_{t}) , t \geq 1 $$
+$$ \theta_{t} | \mathcal{D}_{t} \sim \mathcal{N}(m_{t}, C_{t}), t \geq 1 $$
 
 Se tiene que:
 
@@ -428,7 +428,7 @@ $$ C_{t+k}=R_{t+k} - R_{t+k}F^{'}_{t+k}Q^{-1}_{t+k}F_{t+k}R_{t+k}  $$
 
 ## Propuesta y justificación modelos DLM
 
-Como se mencionó en  @fig-defunciones_ano , la cantidad de defunciones totales siguen una cierta tendencia lineal creciente, en particular para años posteriores a 1980.
+Como se mencionó en  @fig-defunciones_ano, la cantidad de defunciones totales siguen una cierta tendencia lineal creciente, en particular para años posteriores a 1980.
 
 Debido a que esta es nuestra variable de interés para realizar un pronóstico, es propicio para nuestro estudio en cuestión la implementación de un modelo con supuesto de linealidad, como se mencionó justamente los DLM siguen este supuesto.
 
@@ -445,7 +445,7 @@ Como una primer implementación se utilizará un modelo ARIMA. Tal como lo menci
 
 La escogencia de este modelo al ser un DLM, sigue la misma línea de justificación antes mencionado sobre la elección de modelos DLM para nuestro estudio, siendo este un caso particular de estos.
 
-Sin embargo, es importante mencionar que la escogencia de este modelo como primera implementación también se basa en su simplicidad, y en que dada la bibliografía consultada, se observa que en múltiples investigaciones con temáticas relacionadas a nuestro estudio como el de  @adekambi  y el estudio por @ordorika , se implementa este tipo de modelo.
+Sin embargo, es importante mencionar que la escogencia de este modelo como primera implementación también se basa en su simplicidad, y en que dada la bibliografía consultada, se observa que en múltiples investigaciones con temáticas relacionadas a nuestro estudio como el de  @adekambi  y el estudio por @ordorika, se implementa este tipo de modelo.
    
 No obstante, según @petrisDLM estos modelos proporcionan un enfoque de caja negra para el análisis de datos, ofreciendo la posibilidad de predecir observaciones futuras, pero con una interpretabilidad muy limitada del modelo ajustado.
 
@@ -537,7 +537,7 @@ tsdiag(modelo)
 
 
 
-En la @fig-diagARIMA se aprecia que los residuos no parecen mostrar ningún patrón significante y la varianza aparenta ser constante. El gráfico de ACF confirma que no existe correlación en los residuos. En el último gráfico se muestra que bajo la prueba de Ljung-Box en cada rezago se encuentra evidencia estadística de bondad de ajuste del modelo seleccionado. Finalmente, con este modelo se lleva a cabo el diagnóstico a dos años. 
+En la @fig-diagARIMA se aprecia que los residuos no parecen mostrar ningún patrón significante y la varianza aparenta ser constante. El gráfico de ACF confirma que no existe correlación en los residuos. En el último gráfico se muestra que bajo la prueba de Ljung-Box en cada rezago se encuentra evidencia estadística de bondad de ajuste del modelo seleccionado. Finalmente, con este modelo se lleva a cabo el pronóstico a dos años. 
 
 
 ```{r}
