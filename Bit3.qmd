@@ -452,7 +452,7 @@ No obstante, según @petrisDLM estos modelos proporcionan un enfoque de caja neg
 Por lo que para bitácoras posteriores se describirán en detalle e implementaran dos modelos de mayor complejidad pero con una mejor interpretabilidad, como lo son los DLM  polinomiales de primer y segundo orden, antes mencionados.
 
 
-En cuanto a la implementación del primer intento utilizando ARIMA, como se quiere hacer una comparación entre los modelos, se usará una base de entrenamiento y una de prueba para hacer el diagnóstico y cuyos valores ya son conocido para poder valorar la eficacia de dicho modelo. Se quiere hacer el pronóstico a dos años, por lo que la base entrenamiento será los datos entre 1950 y 2018, y se pronosticará las defunciones totales para el 2019 y 2020. 
+En cuanto a la implementación del primer intento utilizando ARIMA, como se quiere hacer una comparación entre los modelos, se usará una base de entrenamiento y una de prueba para hacer el diagnóstico y cuyos valores ya son conocidos para poder valorar la eficacia de dicho modelo. Se quiere hacer el pronóstico a dos años, por lo que la base de entrenamiento serán los datos entre 1950 y 2018, y se pronosticará las defunciones totales para el 2019 y 2020. 
 
 ```{r}
 entrenamiento <- base$defunciones[1:69]
@@ -478,7 +478,7 @@ plot(serie)
 acf2(serie, main="")
 ```
 
-Se observa de la @fig-serieDefunciones no estacionareidad muy clara, además de que la decadencia de las correlaciones no son suficientemente rápidas. Se lleva a cabo una diferenciación 
+Se observa de la @fig-serieDefunciones no estacionareidad muy clara, además de que en la @fig-ACFDefunciones se aprecia que la decadencia de las correlaciones no son suficientemente rápidas. Se lleva a cabo una diferenciación 
 
 ```{r}
 #| fig-cap: "Serie de tiempo de defunciones totales con una diferencia"
@@ -537,8 +537,16 @@ tsdiag(modelo)
 
 
 
-En la @fig-diagARIMA se aprecia que los residuos no parecen mostrar ningún patrón significante y la varianza aparenta ser constante. El gráfico de ACF confirma que no existe correlación en los residuos. En el último gráfico se muestra que bajo la prueba de Ljung-Box en cada rezago se encuentra evidencia estadística de bondad de ajuste del modelo seleccionado. Finalmente, con este modelo se lleva a cabo el pronóstico a dos años. 
+En la @fig-diagARIMA se aprecia que los residuos no parecen mostrar ningún patrón significante y la varianza aparenta ser constante. El gráfico de ACF confirma que no existe correlación en los residuos. En el último gráfico se muestra que bajo la prueba de Ljung-Box existe evidencia de que no hay ninguna estructura remanente en los residuos, lo que apoya la selección de este modelo. También se puede utilizar la función de auto.arima la cual ajusta modelos ARMA para diferentes escogencias de p y q y los compara utilizando criterios de AIC y BIC para confirmar la elección de este modelo
 
+```{r}
+modelo1 <- auto.arima(serie)
+summary(modelo1)
+```
+
+
+
+Finalmente, con este modelo se lleva a cabo el pronóstico a dos años. 
 
 ```{r}
 #| fig-cap: "Pronóstico a dos años utilizando el modelo ARIMA"
@@ -548,13 +556,15 @@ En la @fig-diagARIMA se aprecia que los residuos no parecen mostrar ningún patr
 pronostico <- forecast(modelo, h=2)
 plot(pronostico)
 ```
+
+
 ```{r}
 #| tbl-cap: "Pronóstico e intervalos de confianza del modelo ARIMA"
 #| label: tbl-proARIMA
 #| tbl-pos: 'h'
 #| echo: false
 pronostico %>% kbl() %>%
-  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(latex_options = c("striped"))  %>%
   kable_styling(full_width = F)%>%kable_classic_2() %>% row_spec(0,bold=TRUE)
 ```
 
