@@ -406,7 +406,7 @@ Según @petrisDLM en los DLM, el filtro de Kalman proporciona las fórmulas para
 
 Para un DLM, si se cumple que:
 
-$$ \theta_{t} | \mathcal{D}_{t} \sim \mathcal{N}(m_{t}, C_{t}), t \geq 1 $$
+\[ \theta_{t} | \mathcal{D}_{t} \sim \mathcal{N}(m_{t}, C_{t}), t \geq 1 \]
 
 Se tiene que:
 
