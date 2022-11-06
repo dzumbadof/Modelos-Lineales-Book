@@ -8,6 +8,21 @@ otros de la Tierra. Un punto muy importante para el presente trabajo es que la T
 "revolución demográfica" en los primeros, en alución al crecimiento repentino de la población debido a los factores mortalidad y natalidad, pero de "explosión demográfica" en el caso de los segundos [@alcalde2010teoria]. Entre las razones para el nombre para los países subdesarrollados están que estos, entre 1950 y 1975 alcanzan su transición demográfica como del descenso de la mortalidad gracias a la difusión de los progresos sanitarios [@alcalde2010teoria]. Este último punto parece aplicar al caso costarricense, según lo expone @rosero2004situacion, quien afirma que "los logros en los primeros cincuenta años de salud pública en el país (de 1930 a 1980) se alcanzaron mediante el control de enfermedades transmisibles como las diarreicas, la malaria y la tuberculosis [...] estos tres grupos de causas de muerte explican por sí solos la mitad de la disminución de la mortalidad
 de 1930 a 1960" [-@rosero2004situacion]
 
+
+La Teoría de la transición epidemiológica (TTE) surge como alternativa teórica de la ya menciona Teoría de transición demográfica (TTD) debido a la naturaleza descriptiva o evolucionista de esta. La TTE tiene un carácter más multidisciplinar y con esto multifactorial.
+
+Esta teoria establece que los principales factores causantes de las transiciones demográficas son los
+factores ecobiológicos de la mortalidad,factores biopsicológicos, como el uso de contraconceptivos ante el aumento de la supervivencia infantil generando un aumento de la EV, factores médicos y de salud pública, factores psicológicos o emocionales, y factores socioeconómicos, ya que los desarrollos económicos establecen los primeros sistemas sanitarios, ayudando así al descenso de la mortalidad y la reducción de la incidencia de las enfermedades infecciosas.
+
+Es importante mencionar que tal como lo estable  @mariscal2018tres la TTE, tiene como objeto de estudio la mortalidad, ya que se centra en aspectos como: patrones de enfermedad, causas de las muertes y la interacción de estas con patrones demográficos, económicos y sociológicos.
+
+En síntesis, la TTE bajo su estudio establece que las enfermedades degenerativas modernas y las patologías creadas por el ser humano son las principales causas de mortalidad y morbilidad. Como causas secundarias, son aquellas ligadas a hambrunas, pandemias, guerras, originando acusados picos de mortalidad durante la evolución demográfica de las sociedades. 
+
+
+
+
+
+
 # Modelos estadísticos propuestos
 
 
