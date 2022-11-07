@@ -20,13 +20,13 @@ library(forecast)
 ```
 
 ## Objetivos 
-**Objetivo general: ** Hacer un pronóstico de la cantidad de defunciones totales de Costa Rica para una ventana de tiempo de dos años (2019 y 2020). 
+**Objetivo general: ** Hacer un pronóstico de la cantidad de defunciones totales de Costa Rica para una ventana de tiempo de dos años (2019 y 2020) utilizando datos de 1950 al 2018. 
 
-**Objetivo específico 1: ** Ajustar un modelo ARIMA a los datos con el chequeo correspondiebte de los supuestos y bondad de ajuste
+**Objetivo específico 1: ** Ajustar un modelo ARIMA a los datos con el chequeo correspondiente de los supuestos y bondad de ajuste
 
-**Objetivo específico 2: ** Ajustar y seleccionar un modelo utilizando dlm polinomial con el chequeo correspondiente de los supuestos y bondad de ajuste
+**Objetivo específico 2: ** Ajustar y seleccionar un modelo dlm polinomial con el chequeo correspondiente de los supuestos y bondad de ajuste
 
-**Objetivo específico 3: ** Comparar los pronósticos obtenidos con cada modelo
+**Objetivo específico 3: ** Comparar los pronósticos obtenidos con cada modelo utilizando los datos reales como referencia. 
 
 
 ## Introducción al marco teórico
@@ -95,7 +95,7 @@ colnames(base) <- c("Año",
                     "Tasa neta de reproducción"				
 )
 ```
-En la tabla @tbl-resumen5numeros se detalla el resumen de cinco números para algunas variables relevantes de la tabla de datos.
+En la tabla @tbl-resumen5numeros se detalla el resumen de cinco números para algunas variables relevantes de la tabla de datos. Se observa un rango bastante amplio (diferencia entre el máximo y mínimo) en las defunciones totales, lo que es de esperarse dado el crecimiento poblacional que se vio a partir de los 1980's y la cantidad de años que se registran en los datos. 
 
 ```{r, echo=F}
 #| tbl-cap: "Resumen de cinco números para algunas variables de la tabla de datos"
@@ -357,4 +357,4 @@ Es oportuno señalar que el desarrollo teórico de estos modelos se llevará a c
 
 ## UVE de Gowin
 
-![UVE Heurística](Images/UVE%20Flecha.png){fig-align="center" width="600"}
+![UVE Heurística](Images/UVE2.png){fig-align="center" width="600"}
