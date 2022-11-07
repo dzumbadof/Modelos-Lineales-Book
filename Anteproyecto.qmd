@@ -1,4 +1,35 @@
-# Introducción al marco teórico
+# Anteproyecto
+```{r, R.options, echo=F, include=F, warning=F, message=F}
+options(knitr.kable.NA = '-', echo = F)
+library(readxl)
+library(kableExtra)
+library(dplyr)
+library(janitor)
+library(ggplot2)
+library(wesanderson)
+library(cowplot)
+library(viridis)
+library(GGally)
+library(scales)
+
+
+#Paquetes para series de tiempo
+library(astsa)
+library(tseries)
+library(forecast)
+```
+
+## Objetivos 
+**Objetivo general: ** Hacer un pronóstico de la cantidad de defunciones totales de Costa Rica para una ventana de tiempo de dos años (2019 y 2020). 
+
+**Objetivo específico 1: ** Ajustar un modelo ARIMA a los datos con el chequeo correspondiebte de los supuestos y bondad de ajuste
+
+**Objetivo específico 2: ** Ajustar y seleccionar un modelo utilizando dlm polinomial con el chequeo correspondiente de los supuestos y bondad de ajuste
+
+**Objetivo específico 3: ** Comparar los pronósticos obtenidos con cada modelo
+
+
+## Introducción al marco teórico
 
 En términos generales, la demografía es "una ciencia que estudia las poblaciones humanas, su dimensión, estructura, evolución y características generales" [@bruno2019analisis] y además "estudia estadísticamente la estructura y la dinámica de las poblaciones, así como los procesos concretos que determinan su formación, conservación y desaparición [...] tales procesos son los de fecundidad, mortalidad y migración: emigración e inmigración"  [@bruno2019analisis]. De acuerdo al mismo autor, hay dos grandes tipos de demografía: la estática, que "estudia las poblaciones humanas en un momento de tiempo determinado desde un punto de vista de dimensión, territorio, estructura y características estructurales" [-@bruno2019analisis] y la dinámica, "que estudia las poblaciones humanas desde el punto de vista de la evolución en el transcurso del tiempo y los mecanismos por los que se modifica la dimensión, estructura y distribución geográfica de las poblaciones" [-@bruno2019analisis]. Bajo estas concepciones, el presente trabajo caería en el campo de la demografía dinámica, pues se buscará realizar pronóstico sobre la serie histórica de defunciones de Costa Rica de 1950 a 2020. En ese sentido, @REES2020239 afirma que una de las mayores contribuciones de la demografía ha sido el desarrollo de modelos para la proyección de futuras poblaciones, lo cuál está estrechamente relacionado con la proyección de defunciones. Según @maccio1985diccionario la mortalidad o defunción se emplea para expresar la acción de la muerte sobre la población y esta se mide en valores absolutos y sobre el año calendario. Por su parte y de acuerdo a @brownlee, la realización de predicciones sobre el futuro se denomina extrapolación en el tratamiento estadístico clásico de los datos de las series temporales. Los campos más modernos que se centran en el tema, lo denominan pronóstico de series temporales. El pronóstico consiste en tomar modelos ajustados a datos históricos y utilizarlos para predecir observaciones futuras. Asimismo, una serie cronológica o crónica se le llama a "la que forman los valores sucesivos que una cierta variable ha tomado en el transcurso del tiempo" [@maccio1985diccionario], como lo puede ser, por ejemplo, la serie de defunciones totales anuales para un país en específico.
 
@@ -27,10 +58,214 @@ factores ecobiológicos de la mortalidad, factores biopsicológicos, como el uso
 Es importante mencionar que tal como lo establece @mariscal2018tres la TTE, tiene como objeto de estudio la mortalidad, ya que se centra en aspectos como: patrones de enfermedad, causas de las muertes y la interacción de estas con patrones demográficos, económicos y sociológicos.
 
 
+## Descripción detallada de los datos
+
+La tabla de datos proviene del Instituto Nacional de Estadística y Censos (INEC) de Costa Rica y es de acceso público, descargable desde la página web del instituto, como puede consultarse en @INEC_base. Esta base presenta los principales indicadores demográficos anuales de Costa Rica durante el periodo 1950-2020. Incluye en total 18 variables, entre las cuales están el año, la población total al 30 de junio de cada año, desagregado también por sexo, así como la cantidad de defunciones. Las variables presentes en la tabla son las siguientes: **Población de estudio:**La población de estudio son aquellas personas que vivían en Costa Rica entre los años 1950-2020 y mueren en este periodo. **Muestra observada:** La muestra observada, son todas aquellas personas que vivían en Costa Rica y al morir son  registrados por el Instituto Nacional de Estadística y Censo. **Unidad estadística o individuos**: La unidad estadística es el recuento anual de defunciones en Costa Rica. **Variables de estudio:** Son un total de 18 variables, las cuales según @INEC_conceptos se tiene: **Año:** Esta variable indica el año. **Total:** Esta variable registra la población total. **Hombres:** Esta variable registra la población total de hombres. **Mujeres:** Esta variable se encarga de registar el total de mujeres. **Nacimientos:** Esta variable registra el total de nacimientos. **Defunciones:** Esta variable registra el total de defunciones. **Defunciones infantiles:** Esta variable registra las defunciones de infantes (niños y niñas). **Defunciones neonatales:** Esta variable registra las defunciones de recién nacidos, hace referencia a la mortalidad de los nacidos antes de alcanzar los 28 días de edad. **Defunciones fetales:** Esta variable registra las defunciones de fetos, se refiere a la mortalidad de un bebé antes o durante el parto. **Tasa de crecimiento:** Esta variable registra la tasa de crecimiento de la población costarricense.Se refiere al crecimiento de la población entre dos fechas sin contemplar la migración.
+**Tasa de natalidad:** Esta variable registra la tasa de nacimientos registrados en la población costarricenses. **Tasa de mortalidad:** Esta variable registra la tasa de muertes en su totalidad.
+**Tasa de mortalidad infantil** Esta variable registra la tasa de muertes infantiles **Tasa de mortalidad neonatal:** Esta variable registra la tasa de muertes neonatales. **Tasa de mortalidad fetal:** En esta variable se registra la tasa de muertes fetales. **Tasa global de fecundidad:** Esta variable registra la tasa de fecundidad global (TGF), la cual indica cantidad de hijos e hijas que en promedio tendría cada mujer al final del periodo fértil, si durante su vida tiene sus hijos e hijas de acuerdo a las tasas de fecundidad por edad observadas en el país y año de interés y, además estas mujeres no están afectadas por la mortalidad desde el nacimiento hasta el final de periodo fértil.
+**Tasa bruta de reproducción:** Esta variable hace referencia a el cantidad de hijas que en promedio
+tendría cada mujer al final del periodo fértil, si durante su vida tiene sus hijos e hijas de acuerdo a las tasas de fecundidad por edad observadas en el país y año de interés y, además estas mujeres no están afectadas por la mortalidad desde el nacimiento hasta el final de periodo fértil. **Tasa neta de reproducción:** es el número de hijas que en promedio tendría cada mujer al final del periodo fértil, si durante su vida tiene sus hijos e hijas de acuerdo a las tasas de fecundidad por edad observadas en el país y año de interés y, además estas mujeres sí están afectadas por la mortalidad por edad observada en el país y año de interés desde el nacimiento hasta el final de periodo fértil.
+
+## Análisis descriptivo de los datos
+
+```{r}
+#| echo: false
+#| warning: false 
+#| output: false
+base <- data.frame(read_excel("sepoblacev1950-2020_0.xls", 
+    range = "B9:S80", col_types = "numeric"))
+
+colnames(base) <- c("Año",
+                    "Población total",
+                    "Población de hombres",
+                    "Población de mujeres",
+                    "Nacimientos",
+                    "Defunciones",
+                    "Defunciones infantiles",
+                    "Defunciones neonatales",
+                    "Defunciones fetales",
+                    "Tasa de crecimiento",
+                    "Tasa de natalidad",
+                    "Tasa de mortalidad",
+                    "Tasa de mortalidad infantil",
+                    "Tasa de mortalidad neonatal",
+                    "Tasa de mortalidad fetal",
+                    "Tasa global de fecundidad",
+                    "Tasa bruta de reproducción",
+                    "Tasa neta de reproducción"				
+)
+```
+En la tabla @tbl-resumen5numeros se detalla el resumen de cinco números para algunas variables relevantes de la tabla de datos.
+
+```{r, echo=F}
+#| tbl-cap: "Resumen de cinco números para algunas variables de la tabla de datos"
+#| label: tbl-resumen5numeros
+
+resumen <- apply(base[,2:9], 2, fivenum) %>% as.data.frame()
+
+row.names(resumen) <- c("Mínimo", "Primer cuartil", "Mediana", "Tercer cuartil", "Máximo") 
+
+tabla <- resumen %>%
+  kbl(align = rep('r', ncol(resumen)),
+      format.args = list(big.mark = ' '),booktabs=T)  %>%  column_spec(1,bold = TRUE) %>%
+  row_spec(0,bold=TRUE)  %>% 
+      column_spec(1:9,width = "3cm") %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(full_width = F) %>% 
+  kable_classic_2() %>% 
+  scroll_box()
+
+tabla
+```
+
+En la tabla @tbl-estadisticos_dispersion se detallan los estadísticos de desviación estándar y rango intercuartílico para algunas variables relevante de la tabla de datos.
+
+```{r, echo=F}
+#| tbl-cap: "Estadísticos de dispersión para algunas variables de la tabla de datos"
+#| label: tbl-estadisticos_dispersion 
 
 
+estadisticos_dispersion <- function(x){
+  return(c(sd(x), IQR(x)))
+}
 
-# Modelos estadísticos propuestos
+resumen <- apply(base[,2:9], 2, estadisticos_dispersion) %>% as.data.frame()
+
+row.names(resumen) <- c("Desviación estándar", "Rango intercuartílico") 
+
+tabla <- resumen %>%
+  kbl(align = rep('r', ncol(resumen)),
+      format.args = list(big.mark = ' '),booktabs=T)  %>%  column_spec(1,bold = TRUE) %>%
+  row_spec(0,bold=TRUE)  %>% 
+      column_spec(1:9,width = "3cm") %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(full_width = F) %>% 
+  kable_classic_2() %>% 
+  scroll_box()
+
+tabla
+```
+
+Se observa que la variable población de hombres presenta mayor dispersión respecto población de mujeres, esta mayor variabilidad en la población de hombres se puede deber a diversos factores, entre ellos : una diferencia en el número de defunciones, nacimientos, o número de migrantes en la población masculina en relación con la de población femenina.
+
+Una observación importante, es que los nacimientos presentan una mayor dispersión respecto a el número de defunciones. Es decir, se observa que el número defunciones anuales presenta menor desviación respecto a la media (desviación estándar) y una menor diferencia entre tercer cuartil y primer cuartil de defunciones (IQR).
+
+Análogamente, se observa que para los tipos de defunción: infantil, neonatales y fetales. Se evidencia una mayor dispersión para las defunciones infantiles, seguidas de las neonatales y por último, con menor dispersión las defunciones fetales. 
+
+Finalmente, se observa una diferencia significativa entre la medidas de dispersión desviación estándar y rango intercuartílico (IQR), esto se debe a la sensibilidad de la desviación estándar a valores extremos, es decir es  posible que existan valores extremos (muy alto o muy bajos respecto a la media) y por esta razón ambas medidas difieran considerablemente, sin embargo para este caso en particular el orden en el grado de dispersión (observe que la dispersión disminuye al avanzar en la tabla de izquierda a derecha) se mantiene para ambos medidas. 
+
+```{r}
+#| tbl-cap: "Frecuencia de defunciones, población y tasa de mortalidad"
+#| label: tbl-freq1
+#| tbl-pos: 'h'
+#| echo: false
+base <- base %>% clean_names()
+
+df <- base %>% mutate( defunciones = cut(defunciones , breaks = 10)) %>% 
+   group_by(defunciones) %>% 
+   summarise(n_defunciones = n() )
+
+df2 <- base %>% mutate( tamanio_poblacion = 
+                          cut(poblacion_total, breaks = 10)) %>% 
+   group_by( tamanio_poblacion ) %>% 
+   summarise(n_pop = n() )
+
+df3 <- base %>%
+  mutate( tasas = cut(tasa_de_mortalidad, breaks = 11)) %>% 
+   group_by( tasas ) %>% 
+   summarise(n_pop = n() )
+
+data.frame(df, df2, df3) %>%
+  kbl( align = 'cccccc', col.names=c("Defunciones", 
+                   "Frec. de defunciones", 
+                   "Población total", 
+                   "Frec. de poblacion", 
+                   "Tasa de mortalidad", 
+                   "Frec. de tasa"), 
+       format.args = list(big.mark = ' '),booktabs=T) %>% 
+  kable_styling(latex_options = c("striped", "condensed", "scale_down"))  %>%
+  kable_styling(full_width = F) %>% 
+  kable_classic_2() %>%
+  row_spec(0,bold=TRUE) %>% 
+  scroll_box()
+```
+
+De la @tbl-freq1 se observa que históricamente las defunciones totales de la mayoría de los años cae dentro del primero y segundo intervalo, con una distribución más uniforme dentro de los intervalos más altos. Por su parte la tasa de mortalidad bruta, la cual se aprecia en las columnas cinco y seis, se muestra que en la mayoría de años la tasa se ha mantenido entre 3.72 y 4.41. Esto quiere decir que la cantidad de defunciones relativo a la población ha sido más o menos constante en la mayoría de años. Por su parte, la población total se ha distribuido más uniformemente en todos los intervalos por lo que se concluye que el crecimiento población se ha movido más rápido que las defunciones.
+
+```{r, echo=FALSE}
+#| fig-cap: "Cantidad de defunciones por año para el periodo 1950-2020"
+#| label: fig-defunciones_ano
+#| fig-cap-location: top
+
+g <- ggplot(base, aes(x=ano, y=defunciones))
+g <- g + geom_point(size = 0.8)
+g <- g + geom_smooth(formula = y~x, method = "loess", se = F)
+g <- g + scale_x_continuous(breaks = seq(1950,2020,5))
+g <- g + scale_y_continuous(breaks = seq(5000, 27000, 5000), limits = c(5000,27000))
+g <- g + labs(x = "Año",
+              y = "Cantidad de defunciones",
+              caption = "Fuente: Elaboración propia")
+
+g <- g + theme_cowplot() 
+
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+
+g
+```
+En la @fig-defunciones_ano se muestra la cantidad total de defunciones para el periodo 1950-2020. Destaca una tendencia creciente muy marcada a partir de cerca de 1980 y hasta el final del periodo considerado. 
+
+En la @fig-def_inf_neonat_fet_ano se comparan las defunciones infantiles, neonatales y fetales. Cabe añadir que la distancia verticar entre las defunciones infantiles y las neonatales resulta en las llamadas defunciones posneonatales, es decir, las que ocurren a partir de los 29 días de edad y hasta un año. Se advierte que a mediados de los años sesenta la cantidad de defunciones infantiles aparenta tener una tendencia decreciente. Al respecto, Rosero Bixby afirma que la caída más dramática en los años setenta "se logra gracias a los programas de atención primaria
+de la salud, ayudados por una extraordinaria reducción de la natalidad que permite un mejor desarrollo intrauterino, mejor cuidado del niño y reduce el riesgo de contagio" [-@rosero2004situacion]. El mismo autor menciona que "el riesgo de morir de los menores de un
+año ha disminuido en forma poco menos que espectacular entre 1970-78, pues ha sido
+reducido a la tercera parte (de 62 a 22 muertes por cada mil nacimientos) en un lapso
+de apenas 8 años" [@rosero2016situacion]. Por su parte, la cantidad de defunciones neonatales superó a las fetales desde mediados de los años cincuenta y hasta mediados de los años ochenta, donde se pierde un poco la noción de cuál suele ser mayor.
+
+```{r, echo=FALSE}
+#| fig-cap: "Defunciones infantiles, neonatales y fetales por año"
+#| label: fig-def_inf_neonat_fet_ano
+#| fig-cap-location: top
+g <- ggplot(base)
+g <- g + geom_line(aes(x=ano, y=defunciones_infantiles, color="Infantil"), lwd=1)
+g <- g + geom_line(aes(x=ano, y=defunciones_neonatales, color="Neonatal"), lwd=1)
+g <- g + geom_line(aes(x=ano, y=defunciones_fetales, color="Fetal"), lwd=1)
+g <- g + scale_x_continuous(breaks = seq(1950,2020,5))
+g <- g + labs(x = "Año",
+              y = "Cantidad de defunciones",
+              caption = "Fuente: Elaboración propia con datos del INEC",
+              color="Tipo de defunción")
+g <- g + theme_cowplot() 
+g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
+g <- g + scale_color_brewer(palette = "PuBuGn")
+g
+```
+
+Para estudiar la asociación entre la tasa de defunciones neonatales y la de defunciones fetales, se crea una variable categórica indicadora de si la primera es mayor a la segunda. Dado que ambas tasas se calculan respecto al mismo denominador (la cantidad de nacimientos), esta variable equivale a hacer los mismo con la cantidad de defunciones respectiva. En la @fig-indicadora_neonat_fet se muestra la distribución de esta variable y se ve que en 15 de los 71 años considerados la tasa de mortalidad fetal fue mayor, donde de la @fig-def_inf_neonat_fet_ano se sabe que esto sucedió mayoritariamente entre 1985 y 2020. En consecuencia, en 56 años fue mayor la tasa de mortalidad neonatal, lo cuál sucede sobre todo en los primeros 35 años a partir de 1950. Entonces, en los 71 años de estudio, 78.87% de las ocasiones fue mayor la tasa de mortalidad neonatal, contra un 21.13% de la fetal.
+
+```{r, echo=FALSE}
+#| fig-cap: "Distribución variable indicadora de la mayor tasa entre las de mortalidad fetal y la neonatal"
+#| label: fig-indicadora_neonat_fet
+#| fig-cap-location: top
+
+# Se crea variable que indica si la tasa de mortalidad neonatal es mayor a la fetal
+datos <- base %>% mutate(indicadora = as.factor(tasa_de_mortalidad_neonatal>tasa_de_mortalidad_fetal))
+
+g <- ggplot(datos) +
+geom_bar(aes(indicadora, fill = indicadora), show.legend = FALSE)
+
+g <- g + scale_x_discrete(labels = c("Fetal", "Neonatal"))
+g <- g + scale_y_continuous(breaks = seq(0,60,5), limits = c(0,60))
+
+g <- g + labs(x = "Tasa de mortalidad mayor",
+              y = "Conteo",
+              caption = "Fuente: Elaboración propia con datos del INEC",
+              color="Tipo de tasa")
+g <- g + theme_cowplot() 
+g <- g + scale_fill_brewer(palette = "PuBuGn")
+g
+
+```
+
+## Modelos estadísticos propuestos
 
 
 Con la finalidad de realizar un pronóstico de la serie de defunciones totales anuales de Costa Rica, se desea implementar el modelo estadístico que mejor se ajuste a los datos.
@@ -78,17 +313,17 @@ $$  f_{t}(k) = {E}[Y_{t+k}|D_{t} ] =F_{t+k}a_{t}(k) $$
 $$ Q_{t}(k)= {Var}[Y_{t+k}|D_{t} ]  =F_{t+k}R_{t}(k)F^{'}_{t+k} + V_{t+k} $$
 
 
-## Justificación modelos DLM propuestos
+### Justificación modelos DLM propuestos
 
 
 Como se mencionó en @fig-defunciones_ano, la cantidad de defunciones totales siguen una cierta tendencia lineal creciente, en particular para años posteriores a 1980.
 
 Debido a que esta es nuestra variable de interés para realizar un pronóstico, es propicio para nuestro estudio en cuestión la implementación de un modelo con supuesto de linealidad, como se mencionó justamente los DLM siguen este supuesto.
 
-Para llevar a cabo los pronósticos se proponen por tanto tres métodos estadísticos pertenecientes a los DLM, estos son: modelo DLM polinomial de primer orden, modelo DLM polinomial de segundo orden y el modelo ARIMA$(p ,d,q)$.
+Para llevar a cabo los pronósticos se proponen por tanto tres métodos estadísticos pertenecientes a los DLM, estos son: modelo DLM polinomial de primer orden, modelo DLM polinomial de segundo orden y el modelo ARIMA$(p,d,q)$.
 
 
-## Modelo ARIMA$(p ,d,q)$
+### Modelo ARIMA$(p,d,q)$
 
 Como una primer implementación se utiliza un modelo ARIMA$(p ,d,q)$. Tal como lo menciona @petrisDLM un modelo ARIMA$(p ,d,q)$ puede ser considerado un DLM, esto ya que es posible representar todo modelo ARIMA($p$,$d$,$q$) (ya sea univariado o multivariado) como un DLM. 
 
@@ -111,7 +346,7 @@ Un modelo para un proceso cuya $d$-ésima diferencia sigue un modelo ARMA$(p,q)$
 La escogencia de los ordenes $p$ y $q$ pueden ser escogidos de una manera informal, observando la autocorrelación empírica y la autocorrelación parcial, o utilizando un criterio de selección de modelos más formal como lo es el AIC y BIC.
 
 
-## Modelos polinomiales de primer y segundo orden
+### Modelos polinomiales de primer y segundo orden
 
 
 Se propone un modelo DLM de primer orden ya que como establece @optimalDLM los DLM de primer orden son algoritmos recomendados al lidiar con datos anuales debido a que las series de tiempo es corta y no presentan patrones estacionales.Dado que nuestros datos son anuales, este modelo se presenta como un posible candidato.
@@ -120,4 +355,6 @@ Por su parte @optimalDLM, señala que los DLM de segundo orden son útiles para 
 
 Es oportuno señalar que el desarrollo teórico de estos modelos se llevará a cabo en bitácoras posteriores, ya que se considera prudente primero realizar la implementación de estos (tal como se realizó  el ARIMA$(p,d,q)$) para ver sus alcances para responder la pregunta de investigación. 
 
+## UVE de Gowin
 
+![UVE Heurística](Images/UVE%20Flecha.png){fig-align="center" width="600"}
