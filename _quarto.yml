@@ -32,6 +32,7 @@ format:
     lof: true
     lot: true
     fig-pos: 'H'
+    number-sections: false
 
 
 editor: source
