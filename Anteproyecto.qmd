@@ -22,9 +22,9 @@ library(forecast)
 ## Objetivos 
 **Objetivo general: ** Hacer un pronóstico de la cantidad de defunciones totales de Costa Rica para una ventana de tiempo de dos años (2019 y 2020) utilizando datos de 1950 al 2018. 
 
-**Objetivo específico 1: ** Ajustar un modelo ARIMA a los datos con el chequeo correspondiente de los supuestos y bondad de ajuste
+**Objetivo específico 1: ** Ajustar un modelo ARIMA a la serie de tiempo de defunciones totales entre 1950 y 2018 en Costa Rica.
 
-**Objetivo específico 2: ** Ajustar y seleccionar un modelo dlm polinomial con el chequeo correspondiente de los supuestos y bondad de ajuste
+**Objetivo específico 2: ** Ajustar un modelo DLM polinomial a la serie de tiempo de defunciones totales entre 1950 y 2018 en Costa Rica.
 
 **Objetivo específico 3: ** Comparar los pronósticos obtenidos con cada modelo utilizando los datos reales como referencia. 
 
@@ -118,7 +118,7 @@ tabla <- resumen %>%
 tabla
 ```
 
-En la tabla @tbl-estadisticos_dispersion se detallan los estadísticos de desviación estándar y rango intercuartílico para algunas variables relevante de la tabla de datos.
+En la tabla @tbl-estadisticos_dispersion se detallan los estadísticos de desviación estándar y rango intercuartílico para algunas variables relevante de la tabla de datos. Se observa que la variable población de hombres presenta mayor dispersión respecto población de mujeres, esta mayor variabilidad en la población de hombres se puede deber a diversos factores, entre ellos : una diferencia en el número de defunciones, nacimientos, o número de migrantes en la población masculina en relación con la de población femenina.
 
 ```{r, echo=F}
 #| tbl-cap: "Estadísticos de dispersión para algunas variables de la tabla de datos"
@@ -145,8 +145,6 @@ tabla <- resumen %>%
 
 tabla
 ```
-
-Se observa que la variable población de hombres presenta mayor dispersión respecto población de mujeres, esta mayor variabilidad en la población de hombres se puede deber a diversos factores, entre ellos : una diferencia en el número de defunciones, nacimientos, o número de migrantes en la población masculina en relación con la de población femenina.
 
 Una observación importante, es que los nacimientos presentan una mayor dispersión respecto a el número de defunciones. Es decir, se observa que el número defunciones anuales presenta menor desviación respecto a la media (desviación estándar) y una menor diferencia entre tercer cuartil y primer cuartil de defunciones (IQR).
 
@@ -212,9 +210,9 @@ g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
 
 g
 ```
-En la @fig-defunciones_ano se muestra la cantidad total de defunciones para el periodo 1950-2020. Destaca una tendencia creciente muy marcada a partir de cerca de 1980 y hasta el final del periodo considerado. 
+En la @fig-defunciones_ano se muestra la cantidad total de defunciones para el periodo 1950-2020. Destaca una tendencia creciente muy marcada a partir de cerca de 1980 y hasta el final del periodo considerado. Esto muestra que se debe hacer una transformación a los datos para lograr la estacionareidad que supone el modelo ARMA. También se resalta que para el 2020 las defunciones totales se encuentran claramente por arriba de la tendencia lo cual se debe probablemente a la pandemia del Covid-19.
 
-En la @fig-def_inf_neonat_fet_ano se comparan las defunciones infantiles, neonatales y fetales. Cabe añadir que la distancia verticar entre las defunciones infantiles y las neonatales resulta en las llamadas defunciones posneonatales, es decir, las que ocurren a partir de los 29 días de edad y hasta un año. Se advierte que a mediados de los años sesenta la cantidad de defunciones infantiles aparenta tener una tendencia decreciente. Al respecto, Rosero Bixby afirma que la caída más dramática en los años setenta "se logra gracias a los programas de atención primaria
+En la @fig-def_inf_neonat_fet_ano se comparan las defunciones infantiles, neonatales y fetales. Cabe añadir que la distancia vertical entre las defunciones infantiles y las neonatales resulta en las llamadas defunciones posneonatales, es decir, las que ocurren a partir de los 29 días de edad y hasta un año. Se advierte que a mediados de los años sesenta la cantidad de defunciones infantiles aparenta tener una tendencia decreciente. Al respecto, Rosero Bixby afirma que la caída más dramática en los años setenta "se logra gracias a los programas de atención primaria
 de la salud, ayudados por una extraordinaria reducción de la natalidad que permite un mejor desarrollo intrauterino, mejor cuidado del niño y reduce el riesgo de contagio" [-@rosero2004situacion]. El mismo autor menciona que "el riesgo de morir de los menores de un
 año ha disminuido en forma poco menos que espectacular entre 1970-78, pues ha sido
 reducido a la tercera parte (de 62 a 22 muertes por cada mil nacimientos) en un lapso
