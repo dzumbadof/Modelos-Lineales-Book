@@ -1,0 +1,247 @@
+# Bitácora 4
+
+## Segundo intento de inferencia
+
+### ARIMA
+
+```{r, R.options, echo=F, include=F, warning=F, message=F}
+options(knitr.kable.NA = '-', echo = F)
+library(readxl)
+library(kableExtra)
+library(dplyr)
+library(janitor)
+library(ggplot2)
+library(wesanderson)
+library(cowplot)
+library(viridis)
+library(GGally)
+library(scales)
+
+
+#Paquetes para series de tiempo
+library(astsa)
+library(tseries)
+library(forecast)
+```
+
+```{r, echo=F, include=F}
+base <- data.frame(read_excel("sepoblacev1950-2020_0.xls", 
+    range = "B9:S80", col_types = "numeric"))
+
+colnames(base) <- c("Año",
+                    "Población total",
+                    "Población de hombres",
+                    "Población de mujeres",
+                    "Nacimientos",
+                    "Defunciones",
+                    "Defunciones infantiles",
+                    "Defunciones neonatales",
+                    "Defunciones fetales",
+                    "Tasa de crecimiento",
+                    "Tasa de natalidad",
+                    "Tasa de mortalidad",
+                    "Tasa de mortalidad infantil",
+                    "Tasa de mortalidad neonatal",
+                    "Tasa de mortalidad fetal",
+                    "Tasa global de fecundidad",
+                    "Tasa bruta de reproducción",
+                    "Tasa neta de reproducción"				
+)
+
+base <- base %>% clean_names()
+
+ 
+```
+
+```{r}
+#| echo: false
+entrenamiento <- base$defunciones[1:69]
+serie <- ts( entrenamiento, start=c(1950,1), frequency=1)
+```
+
+En la bitácora anterior se hizo un ajuste de un modelo ARIMA a la serie de defunciones totales. En esta bitácora nuevamente se hará un ajuste similar, y a pesar de que el modelo escogido es el mismo, se hará un análisis más certero sobre los grados implicados por los gráficos de ACF y PACF empíricos, los diagnósticos de los modelos y se hará una comparación entre tres propuestas. Este último elemento fue particularmente faltante en la última bitácora.
+
+
+```{r}
+#| fig-cap: "Serie de tiempo de defunciones totales"
+#| label: fig-serieDefunciones
+#| fig-cap-location: top
+#| echo: false
+plot(serie, main="", xlab="Tiempo", ylab='Defunciones totales')
+```
+
+```{r}
+#| fig-cap: "ACF y PACF de la serie de defunciones totales con una diferencia"
+#| label: fig-ACFDefunciones
+#| fig-cap-location: top
+#| echo: false
+t<-acf2(serie, main="")
+```
+
+En la @fig-serieDefunciones se observa que la serie de defunciones totales no es estacionaria. Esto se confirma con el gráfico en la @fig-ACFDefunciones confirma que la decadencia de las correlaciones no es suficientemente rápida. Se lleva a cabo un diferencia para tratar de eliminar la tendencia.
+
+```{r}
+#| echo: false
+seriedif <- diff(serie)
+seriedif2 <- diff(serie, differences = 2)
+```
+
+```{r}
+#| echo: false
+#| layout-ncol: 2
+#| fig-cap: "Gráficos para la serie de defunciones totales con una y dos diferencias"
+#| fig-subcap:
+#|    - "Serie con una diferencia"
+#|    - "ACF y PACF de serie con una diferencia"
+#|    - "Serie con dos diferencias"
+#|    - "ACF y PACF de serie con dos diferencias"
+#| label: fig-graficosDiferencias
+
+
+plot(seriedif, xlab='Tiempo', ylab="")
+t<-acf2(seriedif, main="")
+plot(seriedif2, xlab='Tiempo', ylab='')
+t<-acf2(seriedif2, main="")
+```
+
+En la @fig-graficosDiferencias se observa que aún con una diferencias es discernible una tendencia, particularmente luego de 1970 donde es creciente. Al aplicarle una segunda diferencia se obtiene una serie que parece ser estacionaria. Observando el ACF empírico se nota que la decadencia de las correlaciones es suficientemente rápida. Se procede a hacer el ajuste del modelo para la serie con dos diferencias. En la @fig-graficosDiferencias se ve en los gráficos de ACF y PACF para la serie con dos diferencias que el ACF se corta luego del primer rezago, mientras que el PACF tiene una decadencia gradual. Esto implica un modelo MA(1). También es posible que haya una decadencia gradual del ACF y PACF, lo que implicaría un modelo ARMA(1,1) o ARMA(2,2). Por lo tanto los modelos propuestos son  MA(1) o equivalentemente ARMA(0,1), ARMA(1,1), ARMA(2,1), ARMA(2,2).  
+
+```{r}
+#| echo: false
+#| fig-cap: 'Diagnósticos del modelo ARIMA(0,2,1)'
+#| label: fig-diagMa1
+modelo1 <- sarima(seriedif2, 0,2,1)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: 'Diagnósticos del modelo ARIMA(1,2,1)'
+#| label: fig-diagARIMA121
+modelo2 <- sarima(serie, 1,2,1)
+```
+```{r}
+#| echo: false
+#| fig-cap: 'Diagnósticos del modelo ARIMA(2,2,1)'
+#| label: fig-diagARIMA221
+modelo3 <- sarima(serie, 2,2,1)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: 'Diagnósticos del modelo ARIMA(2,2,2)'
+#| label: fig-diagARIMA222
+modelo4 <- sarima(serie, 2,2,2)
+```
+
+En la @fig-diagMa1 se observa que se obtienen residuos que aparentan no tener varianza constante, específicamente se observa que las innovaciones estandarizadas tienen menor varianza entre 1975 y el 2000. Además, a pesar de ajustarse bien a una normal, se observa en el ACF que conservan un alto grado de dependencia, lo cual también se confirma con el estadístico Q de Box-Pierce-Ljung, en el cual se obtiene un valor-p consistentemente en la zona de rechazo. Se concluye que el modelo MA(1) no es un buen ajuste. Observando los diagnósticos de los otros modelos se obtienen residuos que parecen ser ruido blanco. Se observa que en el caso del modelo ARIMA(1,2,1) se da un no rechazo de la independencia según la pruba de Ljung-Box. Se consideran los modelos ARIMA(1,2,1) ARIMA(2,2,1) Y ARIMA(2,2,2) como candidatos no rechazados. 
+
+```{r}
+#| echo: false
+modelo <- c('ARIMA(1,2,1)', 'ARIMA(2,2,1)' , 'ARIMA(2,2,2)') 
+W <- rep(NA, 3) #estadistico de Shapiro-Wilks
+SWp <- rep(NA,3) #Valor p de prueba Shapiro-Wilks
+
+Q <- rep(NA,3) #estadistico de Ljung-Box
+LBp <- rep(NA,3) #valor p de prueba de Ljung-Box
+```
+
+```{r}
+#| echo: false  
+# Pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia
+
+#Modelo ARIMA(1,2,1)
+std.innov <- modelo2$fit$residuals/sqrt(modelo2$fit$sigma2)
+W[1] <- shapiro.test(std.innov)$statistic
+SWp[1] <- shapiro.test(std.innov)$p.value
+Q[1] <- Box.test(std.innov, type='Ljung')$statistic
+LBp[1] <- Box.test(std.innov, type='Ljung')$p.value
+
+#Modelo ARIMA(2,2,1)
+std.innov <- modelo3$fit$residuals/sqrt(modelo3$fit$sigma2)
+W[2] <- shapiro.test(std.innov)$statistic
+SWp[2] <- shapiro.test(std.innov)$p.value
+Q[2] <- Box.test(std.innov, type='Ljung')$statistic
+LBp[2] <- Box.test(std.innov, type='Ljung')$p.value
+
+#Modelo ARIMA(2,2,2)
+std.innov <- modelo4$fit$residuals/sqrt(modelo4$fit$sigma2)
+W[3] <- shapiro.test(std.innov)$statistic
+SWp[3] <- shapiro.test(std.innov)$p.value
+Q[3] <- Box.test(std.innov, type='Ljung')$statistic
+LBp[3] <- Box.test(std.innov, type='Ljung')$p.value
+```
+
+```{r}
+#| echo: false
+# AIC Y BIC de los modelos
+
+AIC <- c(modelo2$AIC, modelo3$AIC, modelo4$AIC)
+BIC <- c(modelo2$BIC, modelo3$BIC, modelo4$BIC)
+AICc <- c(modelo2$AICc, modelo3$AICc, modelo4$AICc)
+```
+
+
+```{r}
+#| tbl-cap: "Resumen de diagnósticos de los modelos propuestos"
+#| label: tbl-diagARIMA
+#| tbl-pos: 'h'
+#| echo: false
+data.frame(modelo, W, SWp, Q, LBp, AIC, BIC, AICc) %>%
+  kbl(
+    digits = 2,
+    col.names = c(
+      'Modelo',
+      'Estadístico W',
+      "Valor p Shapiro-Wilks",
+      "Estadístico Q",
+      "Valor p Ljung-Box",
+      "AIC",
+      "BIC",
+      "AICc"
+    )
+  ) %>%
+  kable_styling(latex_options = c("striped"))  %>%
+  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
+                                                                     TRUE)
+```
+
+La @tbl-diagARIMA resume las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Se da un no rechazo de las hipótesis nulas en los tres modelos, lo que confirma que los tres pueden ser viables. Al examinar el se observa que el modelo ARIMA(1,2,1) Obtuvo el menor valor en el BIC y en el AICc. Para el AIC, el modelo ARIMA(2,2,2) obtuvo el menor valor, sin embargo el modelo más simple también resultó extremadamente cercano. Por el principio de parsimonía y por el posible impacto que tenga el sobreajuste sobre el pronóstico se decide escoger el modelo ARIMA(1,2,1). Se procede a hacer el pronóstico. 
+
+```{r}
+#| echo: false
+def.for <- sarima.for(serie, n.ahead = 2, 1,2,1)
+```
+```{r}
+#| echo: false
+# Intervalos de confianza
+U95 <- def.for$pred + def.for$se*qnorm(1-0.95/2)
+L95 <- def.for$pred - def.for$se*qnorm(1-0.95/2)
+
+U80 <- def.for$pred + def.for$se*qnorm(1-0.8/2)
+L80 <- def.for$pred - def.for$se*qnorm(1-0.8/2)
+
+
+for.int <- data.frame(c(2019, 2020), def.for$pred, L80, U80, L95, U95)
+```
+
+```{r}
+#| tbl-cap: "Intervalos de confianza del modelo ARIMA(1,2,1)"
+#| label: tbl-forARIMA
+#| tbl-pos: 'h'
+#| echo: false
+for.int %>% kbl(
+  digits = 0,
+  col.names = c('Año', 'pred', 'Lower80', 'Upper80', 'Lower95', 'Upper95')
+) %>%
+  kable_styling(latex_options = c("striped"))  %>%
+  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
+                                                                     TRUE)
+```
+
+La @tbl-forARIMA muestra el valor pronosticado para las defunciones totales en los años 2019 y 2020 y los intervalos de confianza al 80% y 95%. Al comparar con los valores reales de de 24292 para el 2019 y 26209 para el 2020
+
+```{r}
+#| echo: false
+abs( as.numeric(def.for$pred) - base$defunciones[70:71])
+```
+
