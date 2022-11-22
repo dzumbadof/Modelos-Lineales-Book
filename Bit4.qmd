@@ -22,6 +22,18 @@ library(scales)
 library(astsa)
 library(tseries)
 library(forecast)
+
+
+#Paquetes para DLM:
+
+library(devtools)
+
+devtools::install_github("https://github.com/cran/dlm")
+
+install.packages("dlm", repos = "https://cran.rstudio.com/", 
+    dependencies = TRUE)
+
+library(dlm)
 ```
 
 ```{r, echo=F, include=F}
@@ -244,4 +256,160 @@ La @tbl-forARIMA muestra el valor pronosticado para las defunciones totales en l
 #| echo: false
 abs( as.numeric(def.for$pred) - base$defunciones[70:71])
 ```
+
+### DLM polinomial de orden 2
+
+
+
+
+```{r}
+
+#| echo: false
+
+#Se crea la estructura del modelo DLM orden 2:
+DLMOrden2 <- function(parm) {
+    dlmModPoly(order = 2, dV = exp(parm[1]), dW = exp(parm[2:3]))
+           
+}
+#Se procede hacer ajuste de parametros via maxima verosimilitud:
+
+ajusteDlmOrden2 <- dlmMLE(serie, rep(0, 3), build = DLMOrden2 , hessian = TRUE)
+
+
+#Se crea el modelo con los parametros obtenidos via maxima verosimilitud:
+
+modeloDlmOrden2 <- DLMOrden2(ajusteDlmOrden2$par)
+
+
+
+```
+
+
+
+
+
+```{r}
+
+#| echo: false 
+
+#Se aplica filtro de Kalman:
+
+filtroDLM2 <-  dlmFilter(serie, mod = modeloDlmOrden2  )
+
+
+#Procedemos hacer forecast, en este caso se hace se hace forecating 2 pasos adelante.
+
+
+forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
+
+```
+
+
+
+
+
+
+```{r}
+#| echo: false
+
+#se calcula el AIC, BIC y AICc 
+
+
+
+
+loglikDLM2 <- dlmLL(serie, dlmModPoly(2))
+numeroParametros <- 3
+n <- length(serie)
+AICDLM2 <- 2 * (numeroParametros) - 2*log(loglikDLM2)  
+BICDLM2 <- (log(n)) * (numeroParametros)- 2*log(loglikDLM2)
+
+AICcDLM2 <-  AICDLM2 + (2*(numeroParametros^(2) + numeroParametros))  /(n- numeroParametros-1)
+
+#Se extraen los residuos:
+resids <- residuals(filtroDLM2, sd = FALSE)
+#Se aplica el test Box-Ljung:
+
+LjungTestDLM2 <-  Box.test(resids, lag = 12, type = "Ljung", fitdf = 2) 
+# Valor p del test Box-Ljung:
+valorPLjungTestDLM2 <-  LjungTestDLM2$p.value
+# estadistico del test Box-Ljung Q:
+
+estadPLjungTestDLM2 <- LjungTestDLM2$statistic
+
+
+#Se aplica el test Shapiro:
+
+ShapiTestDLM2 <-  shapiro.test(resids) 
+# Valor p del test Shapiro:
+valorPShapiTestDLM2 <-  ShapiTestDLM2$p.value
+
+# estadistico del test Shapiro W:
+
+estadShapiTestDLM2 <- ShapiTestDLM2$statistic
+
+
+
+
+```
+
+
+```{r}
+
+#| tbl-cap: "Resumen de diagnósticos de los modelos DLM polinomiales"
+#| label: tbl-diagDLM
+#| tbl-pos: 'h'
+#| echo: false
+
+modeloDLM <- c(' DLM polinomial orden 2')
+
+WDLM <-  c(estadShapiTestDLM2)
+
+SwpDLM <- c(valorPShapiTestDLM2)
+
+QDLM <- c(estadPLjungTestDLM2)
+
+ LBpDLM <- c(valorPLjungTestDLM2)
+ 
+ AICDLM <- c(AICDLM2)
+ 
+ BICDLM <- c(BICDLM2)
+
+ 
+ AICcDLM <- c(AICcDLM2)
+ 
+data.frame(modeloDLM, WDLM, SwpDLM, QDLM, LBpDLM, AICDLM, BICDLM, AICcDLM) %>%
+  kbl(
+    digits = 2,
+    col.names = c(
+      'Modelo',
+      'Estadístico W',
+      "Valor p Shapiro-Wilks",
+      "Estadístico Q",
+      "Valor p Ljung-Box",
+      "AIC",
+      "BIC",
+      "AICc"
+    )
+  ) %>%
+  kable_styling(latex_options = c("striped"))  %>%
+  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
+                                                                     TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
