@@ -34,6 +34,7 @@ install.packages("dlm", repos = "https://cran.rstudio.com/",
     dependencies = TRUE)
 
 library(dlm)
+library(ggmcmc) #Para ACF Y PACF DLM .
 ```
 
 ```{r, echo=F, include=F}
@@ -250,7 +251,7 @@ for.int %>% kbl(
                                                                      TRUE)
 ```
 
-La @tbl-forARIMA muestra el valor pronosticado para las defunciones totales en los años 2019 y 2020 y los intervalos de confianza al 80% y 95%. Al comparar con los valores reales de de 24292 para el 2019 y 26209 para el 2020
+La @tbl-forARIMA muestra el valor pronosticado para las defunciones totales en los años 2019 y 2020 y los intervalos de confianza al 80% y 95%. Al comparar con los valores reales de 24292 para el 2019 y 26209 para el 2020
 
 ```{r}
 #| echo: false
@@ -305,6 +306,17 @@ forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
 ```
 
 
+```{r}
+#| echo: false
+
+#Diagnostico de los residuos:
+
+resids <-  residuals(filtroDLM2, sd = FALSE)
+
+checkresiduals(resids, test = F)
+
+
+```
 
 
 
@@ -312,7 +324,7 @@ forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
 ```{r}
 #| echo: false
 
-#se calcula el AIC, BIC y AICc 
+#Se calcula el AIC, BIC y AICc 
 
 
 
@@ -325,11 +337,10 @@ BICDLM2 <- (log(n)) * (numeroParametros)- 2*log(loglikDLM2)
 
 AICcDLM2 <-  AICDLM2 + (2*(numeroParametros^(2) + numeroParametros))  /(n- numeroParametros-1)
 
-#Se extraen los residuos:
-resids <- residuals(filtroDLM2, sd = FALSE)
+
 #Se aplica el test Box-Ljung:
 
-LjungTestDLM2 <-  Box.test(resids, lag = 12, type = "Ljung", fitdf = 2) 
+LjungTestDLM2 <-  Box.test(resids, lag = 12, type = "Ljung") 
 # Valor p del test Box-Ljung:
 valorPLjungTestDLM2 <-  LjungTestDLM2$p.value
 # estadistico del test Box-Ljung Q:
@@ -398,17 +409,67 @@ data.frame(modeloDLM, WDLM, SwpDLM, QDLM, LBpDLM, AICDLM, BICDLM, AICcDLM) %>%
 
 
 
+Análogamente a los modelos ARIMA , la @tbl-diagDLM muestra las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Para el caso de la prueba Shapiro-Wilks, no rechaza la hipótesis nula para el modelo DLM polinomial de orden 2, validando nuestra hipótesis de normalidad. Por otro lado, para la prueba Ljung-Box de independencia de los residuos estandarizados se da un no rechazo de la hipotesis nula, esto se observa al obtener un valor p de 0.16.
+
+Los valores del AIC, AICc y BIC  se observan que son menores a los obtenidos por los modelos ARIMA mostrados en la tabla @tbl-forARIMA indicando que el modelo DLM polinomial de orden 2 mediante estos criterios es mejor modelo que los ARIMA.
 
 
 
 
 
+```{r}
+#| echo: false
+
+#Se construyen intervalos de confianza para DLM polinomial orden 2:
+
+#Varianza:
+
+varDLM2 <-  unlist( forecastDLM2$Q)
+
+#Desviacion estandar:
+
+sdDLM2 <-  sqrt(varDLM2)
+
+#Intervalo de confianza al 95%:
+
+U95DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.95/2)
+L95DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.95/2)
+
+#Intervalo de confianza al 80%:
+
+U80DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.80/2)
+L80DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.80/2)
+
+datosICDLM2 <- data.frame(c(2019, 2020),forecastDLM2$f  ,L80DLM2, U80DLM2, L95DLM2, U95DLM2)
+
+
+```
+
+
+```{r}
+#| tbl-cap: "Intervalos de confianza del modelo DLM polinomial orden 2"
+#| label: tbl-forDlm2
+#| tbl-pos: 'h'
+#| echo: false
+datosICDLM2 %>% kbl(
+  digits = 0,
+  col.names = c('Año', 'pred', 'Lower80', 'Upper80', 'Lower95', 'Upper95')
+) %>%
+  kable_styling(latex_options = c("striped"))  %>%
+  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
+                                                                     TRUE)
+```
+
+
+En @tbl-forDlm2 se muestran los pronósticos de defunciones realizados por el modelo para el año 2019 y 2020. Se muestran los intervalos de confianza al 80% y 95% de dichos pronósticos. Al comparar con los valores reales de 24292 para el 2019 y 26209 para el 2020 se observa que hay una diferencia de 442 y 644 defunciones aproximadamente.
 
 
 
 
-
-
+```{r}
+#| echo: false
+abs( as.numeric(forecastDLM2$f) - base$defunciones[70:71])
+```
 
 
 
