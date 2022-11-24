@@ -264,7 +264,6 @@ abs( as.numeric(def.for$pred) - base$defunciones[70:71])
 
 
 ```{r}
-
 #| echo: false
 
 #Se crea la estructura del modelo DLM orden 2:
@@ -290,7 +289,6 @@ modeloDlmOrden2 <- DLMOrden2(ajusteDlmOrden2$par)
 
 
 ```{r}
-
 #| echo: false 
 
 #Se aplica filtro de Kalman:
@@ -325,7 +323,7 @@ De los diagnósticos de los residuos  @fig-diagDLM2 se osberva del grafico de AC
 
 
 ```{r}
-
+#| echo: false
 #Se crea codigo para plotear los p values del estadistico Ljung-Box:
 
 
@@ -405,11 +403,11 @@ estadShapiTestDLM2 <- ShapiTestDLM2$statistic
 
 
 ```{r}
-
+#| echo: false
 #| tbl-cap: "Resumen de diagnósticos de los modelos DLM polinomiales"
 #| label: tbl-diagDLM
 #| tbl-pos: 'h'
-#| echo: false
+
 
 modeloDLM <- c(' DLM polinomial orden 2')
 
