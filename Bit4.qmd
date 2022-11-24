@@ -309,7 +309,7 @@ forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
 ```{r}
 #| echo: false
 #| fig-cap: 'Diagnostico Residuos'
-#| label: fig-diagjBDLM2
+#| label: fig-diagDLM2
 
 
 #Diagnostico de los residuos:
@@ -320,7 +320,7 @@ resids <-  residuals(filtroDLM2, sd = FALSE)
 
 
 ```
-De los diagnósticos de los residuos  @fig-diagjBDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
+De los diagnósticos de los residuos  @fig-diagDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
 
 
 
