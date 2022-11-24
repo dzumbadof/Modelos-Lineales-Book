@@ -308,15 +308,55 @@ forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
 
 ```{r}
 #| echo: false
+#| fig-cap: 'Diagnostico Residuos'
+#| label: fig-diagjBDLM2
+
 
 #Diagnostico de los residuos:
 
 resids <-  residuals(filtroDLM2, sd = FALSE)
-
-checkresiduals(resids, test = F)
+#Hace varios plots para el chequeo de residuos.
+ checkresiduals( resids, test = F)
 
 
 ```
+De los diagnósticos de los residuos  @fig-diagjBDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
+
+
+
+```{r}
+
+#Se crea codigo para plotear los p values del estadistico Ljung-Box:
+
+
+acf <- acf(resids , plot = F)
+acf_df <- data.frame(
+  acf = acf$acf,
+  lag = acf$lag
+)
+
+
+#Se calculan los p values del estadistico:
+acf_df$pvalue <- sapply(acf_df$lag, function(i) Box.test(resids, lag=i, type="Ljung-Box")$p.value)
+
+acf_df <-  acf_df[-1,] #Se elimina lag en 0.
+
+```
+
+```{r}
+#| echo: false
+#| fig-cap: ' Valores p del estadistico Ljung-Box '
+#| label: fig-pvaluesLjBDLM2
+
+graficoLjungBoxDLM2 <- ggplot(data = acf_df) +
+    geom_point(aes(lag,pvalue)) +
+    geom_hline(yintercept = 0.05, color = "red", lty= 2) 
+graficoLjungBoxDLM2
+
+```
+
+El grafico @fig-pvaluesLjBDLM2 muestra los p values para el estadistico Ljung-Box donde se observa que los valores p se encuentran por encima del umbral con valor p de 0.05 (linea punteada), indicando que los residuos del modelo DLM polinomial de orden 2 son independientes. Concluimos, que el modelo ajusta bien o que el modelo no muestra una falta de ajuste.
+
 
 
 
