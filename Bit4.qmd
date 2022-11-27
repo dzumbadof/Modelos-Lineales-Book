@@ -68,8 +68,8 @@ base <- base %>% clean_names()
 
 ```{r}
 #| echo: false
-entrenamiento <- base$defunciones[1:69]
-serie <- ts( entrenamiento, start=c(1950,1), frequency=1)
+entrenamiento <- base$defunciones[30:69]
+serie <- ts( entrenamiento, start=c(1980,1), frequency=1)
 ```
 
 En la bitácora anterior se hizo un ajuste de un modelo ARIMA a la serie de defunciones totales. En esta bitácora nuevamente se hará un ajuste similar, y a pesar de que el modelo escogido es el mismo, se hará un análisis más certero sobre los grados implicados por los gráficos de ACF y PACF empíricos, los diagnósticos de los modelos y se hará una comparación entre tres propuestas. Este último elemento fue particularmente faltante en la última bitácora.
@@ -91,66 +91,61 @@ plot(serie, main="", xlab="Tiempo", ylab='Defunciones totales')
 t<-acf2(serie, main="")
 ```
 
-En la @fig-serieDefunciones se observa que la serie de defunciones totales no es estacionaria. Esto se confirma con el gráfico en la @fig-ACFDefunciones confirma que la decadencia de las correlaciones no es suficientemente rápida. Se lleva a cabo un diferencia para tratar de eliminar la tendencia.
+En la @fig-serieDefunciones se observa que la serie de defunciones totales no es estacionaria, pues tiene una tendencia creciente muy clara. Esto se confirma con el gráfico en la @fig-ACFDefunciones que muestra que la decadencia de las correlaciones no es suficientemente rápida (lineal). Se lleva a cabo un diferencia para tratar de eliminar la tendencia.
 
 ```{r}
+#| fig-cap: "Serie de tiempo de defunciones totales con una diferencia"
+#| label: fig-serieDefuncionesDif
+#| fig-cap-location: top
 #| echo: false
-seriedif <- diff(serie)
-seriedif2 <- diff(serie, differences = 2)
+plot(diff(serie), main="", xlab="Tiempo")
 ```
+En la @fig-serieDefuncionesDif no queda claro que la tendencia ha sido eliminado, de hecho parece ser creciente. Más aún, la varianza no aparenta estable, pues se nota más varianza a partir de 1998. 
 
 ```{r}
+#| fig-cap: "Serie de tiempo de la tasa de crecimiento de defunciones"
+#| label: fig-serietasaDefunciones
+#| fig-cap-location: top
 #| echo: false
-#| layout-ncol: 2
-#| fig-cap: "Gráficos para la serie de defunciones totales con una y dos diferencias"
-#| fig-subcap:
-#|    - "Serie con una diferencia"
-#|    - "ACF y PACF de serie con una diferencia"
-#|    - "Serie con dos diferencias"
-#|    - "ACF y PACF de serie con dos diferencias"
-#| label: fig-graficosDiferencias
-
-
-plot(seriedif, xlab='Tiempo', ylab="")
-t<-acf2(seriedif, main="")
-plot(seriedif2, xlab='Tiempo', ylab='')
-t<-acf2(seriedif2, main="")
+plot(diff(log(serie)), main="", xlab="Tiempo")
 ```
+La serie resultante mostrada en la @fig-serietasaDefunciones parece ser estable, estacionaria e interpretable como la tasa de crecimiento porcentual de las defunciones. Esto se confirma al observa el ACF y PACF en la @fig-ACFtasaDefunciones
 
-En la @fig-graficosDiferencias se observa que aún con una diferencias es discernible una tendencia, particularmente luego de 1970 donde es creciente. Al aplicarle una segunda diferencia se obtiene una serie que parece ser estacionaria. Observando el ACF empírico se nota que la decadencia de las correlaciones es suficientemente rápida. Se procede a hacer el ajuste del modelo para la serie con dos diferencias. En la @fig-graficosDiferencias se ve en los gráficos de ACF y PACF para la serie con dos diferencias que el ACF se corta luego del primer rezago, mientras que el PACF tiene una decadencia gradual. Esto implica un modelo MA(1). También es posible que haya una decadencia gradual del ACF y PACF, lo que implicaría un modelo ARMA(1,1) o ARMA(2,2). Por lo tanto los modelos propuestos son  MA(1) o equivalentemente ARMA(0,1), ARMA(1,1), ARMA(2,1), ARMA(2,2).  
+```{r}
+#| fig-cap: "ACF y PACF de la serie de tasa de crecimiento de defunciones"
+#| label: fig-ACFtasaDefunciones
+#| fig-cap-location: top
+#| echo: false
+t<-acf2(diff(log(serie)), main="", max.lag = 15)
+```
+El decrecimiento gradual del ACF y PACF implica un modelo ARMA(1,1) por lo que los modelos propuestos son ARIMA(1,1,0), ARIMA(0,1,1), ARIMA(1,1,1). 
 
 ```{r}
 #| echo: false
-#| fig-cap: 'Diagnósticos del modelo ARIMA(0,2,1)'
+#| fig-cap: 'Diagnósticos del modelo ARIMA(0,1,1)'
 #| label: fig-diagMa1
-modelo1 <- sarima(seriedif2, 0,2,1)
+modelo1 <- sarima(log(serie), 0,1,1)
 ```
 
 ```{r}
 #| echo: false
-#| fig-cap: 'Diagnósticos del modelo ARIMA(1,2,1)'
-#| label: fig-diagARIMA121
-modelo2 <- sarima(serie, 1,2,1)
-```
-```{r}
-#| echo: false
-#| fig-cap: 'Diagnósticos del modelo ARIMA(2,2,1)'
-#| label: fig-diagARIMA221
-modelo3 <- sarima(serie, 2,2,1)
+#| fig-cap: 'Diagnósticos del modelo ARIMA(1,1,0)'
+#| label: fig-diagAR1
+modelo2 <- sarima(log(serie), 1,1,0)
 ```
 
 ```{r}
 #| echo: false
-#| fig-cap: 'Diagnósticos del modelo ARIMA(2,2,2)'
-#| label: fig-diagARIMA222
-modelo4 <- sarima(serie, 2,2,2)
+#| fig-cap: 'Diagnósticos del modelo ARIMA(1,1,1)'
+#| label: fig-diagARIMA111
+modelo3 <- sarima(serie, 1,1,1)
 ```
+Se observa en los diagnósticos que los tres modelos propuestos logran aprobar contundentemente el supuesto de independencia de los residuos mostrado en los gráficos de ACF que ningún rezago tiene significancia. Aún más evidencia para este supuesto es proporcionado por el valor p de la pruebga de Ljung-Box donde se observa un no rechazo de la independencia en los tres modelos. Al observa el qqplot de los residuos en los modelos MA Y AR se observa que la cola izquierda podría ser un problema para la hipótesis de normal, pues estos están al borde de desviarse significativamente de los cuantiles teóricos de la normal. 
 
-En la @fig-diagMa1 se observa que se obtienen residuos que aparentan no tener varianza constante, específicamente se observa que las innovaciones estandarizadas tienen menor varianza entre 1975 y el 2000. Además, a pesar de ajustarse bien a una normal, se observa en el ACF que conservan un alto grado de dependencia, lo cual también se confirma con el estadístico Q de Box-Pierce-Ljung, en el cual se obtiene un valor-p consistentemente en la zona de rechazo. Se concluye que el modelo MA(1) no es un buen ajuste. Observando los diagnósticos de los otros modelos se obtienen residuos que parecen ser ruido blanco. Se observa que en el caso del modelo ARIMA(1,2,1) se da un no rechazo de la independencia según la pruba de Ljung-Box. Se consideran los modelos ARIMA(1,2,1) ARIMA(2,2,1) Y ARIMA(2,2,2) como candidatos no rechazados. 
 
 ```{r}
 #| echo: false
-modelo <- c('ARIMA(1,2,1)', 'ARIMA(2,2,1)' , 'ARIMA(2,2,2)') 
+modelo <- c('ARIMA(0,1,1)', 'ARIMA(1,1,0)' , 'ARIMA(1,1,1)') 
 W <- rep(NA, 3) #estadistico de Shapiro-Wilks
 SWp <- rep(NA,3) #Valor p de prueba Shapiro-Wilks
 
@@ -162,22 +157,22 @@ LBp <- rep(NA,3) #valor p de prueba de Ljung-Box
 #| echo: false  
 # Pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia
 
-#Modelo ARIMA(1,2,1)
-std.innov <- modelo2$fit$residuals/sqrt(modelo2$fit$sigma2)
+#Modelo ARIMA(0,1,1)
+std.innov <- modelo1$fit$residuals/sqrt(modelo1$fit$sigma2)
 W[1] <- shapiro.test(std.innov)$statistic
 SWp[1] <- shapiro.test(std.innov)$p.value
 Q[1] <- Box.test(std.innov, type='Ljung')$statistic
 LBp[1] <- Box.test(std.innov, type='Ljung')$p.value
 
-#Modelo ARIMA(2,2,1)
-std.innov <- modelo3$fit$residuals/sqrt(modelo3$fit$sigma2)
+#Modelo ARIMA(1,1,0)
+std.innov <- modelo2$fit$residuals/sqrt(modelo2$fit$sigma2)
 W[2] <- shapiro.test(std.innov)$statistic
 SWp[2] <- shapiro.test(std.innov)$p.value
 Q[2] <- Box.test(std.innov, type='Ljung')$statistic
 LBp[2] <- Box.test(std.innov, type='Ljung')$p.value
 
-#Modelo ARIMA(2,2,2)
-std.innov <- modelo4$fit$residuals/sqrt(modelo4$fit$sigma2)
+#Modelo ARIMA(1,1,1)
+std.innov <- modelo3$fit$residuals/sqrt(modelo3$fit$sigma2)
 W[3] <- shapiro.test(std.innov)$statistic
 SWp[3] <- shapiro.test(std.innov)$p.value
 Q[3] <- Box.test(std.innov, type='Ljung')$statistic
@@ -188,9 +183,9 @@ LBp[3] <- Box.test(std.innov, type='Ljung')$p.value
 #| echo: false
 # AIC Y BIC de los modelos
 
-AIC <- c(modelo2$AIC, modelo3$AIC, modelo4$AIC)
-BIC <- c(modelo2$BIC, modelo3$BIC, modelo4$BIC)
-AICc <- c(modelo2$AICc, modelo3$AICc, modelo4$AICc)
+AIC <- c(modelo1$AIC, modelo2$AIC, modelo3$AIC)
+BIC <- c(modelo1$BIC, modelo2$BIC, modelo3$BIC)
+AICc <- c(modelo1$AICc, modelo2$AICc, modelo3$AICc)
 ```
 
 
@@ -218,33 +213,36 @@ data.frame(modelo, W, SWp, Q, LBp, AIC, BIC, AICc) %>%
                                                                      TRUE)
 ```
 
-La @tbl-diagARIMA resume las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Se da un no rechazo de las hipótesis nulas en los tres modelos, lo que confirma que los tres pueden ser viables. Al examinar el se observa que el modelo ARIMA(1,2,1) Obtuvo el menor valor en el BIC y en el AICc. Para el AIC, el modelo ARIMA(2,2,2) obtuvo el menor valor, sin embargo el modelo más simple también resultó extremadamente cercano. Por el principio de parsimonía y por el posible impacto que tenga el sobreajuste sobre el pronóstico se decide escoger el modelo ARIMA(1,2,1). Se procede a hacer el pronóstico. 
+La @tbl-diagARIMA resume las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Se da un no rechazo de las hipótesis nulas de independencia y normalidad de los residuos en los tres modelos, lo que confirma que los tres pueden ser viables. Se observa que los modelos ARIMA(1,1,0) y ARIMA(0,1,1) obtuvieron los mejores resultados en cuestión de medidas de bondad de ajuste por lo que se escoge el modelo autoregresivo para hacer los pronósticos.
 
 ```{r}
+#| fig-cap: 'Pronóstico del modelo ARIMA(1,1,0) de la tasa de defunciones '
+#| label: fig-pronosticoARIMA
 #| echo: false
-def.for <- sarima.for(serie, n.ahead = 2, 1,2,1)
+def.for <- sarima.for(log(serie), n.ahead = 2, 1,1,0)
 ```
+
 ```{r}
 #| echo: false
 # Intervalos de confianza
-U95 <- def.for$pred + def.for$se*qnorm(1-0.95/2)
-L95 <- def.for$pred - def.for$se*qnorm(1-0.95/2)
+U95 <- exp(def.for$pred + def.for$se*qnorm(1-0.05/2))
+L95 <- exp(def.for$pred - def.for$se*qnorm(1-0.05/2))
 
-U80 <- def.for$pred + def.for$se*qnorm(1-0.8/2)
-L80 <- def.for$pred - def.for$se*qnorm(1-0.8/2)
+U80 <- exp(def.for$pred + def.for$se*qnorm(1-0.2/2))
+L80 <- exp(def.for$pred - def.for$se*qnorm(1-0.2/2))
 
 
-for.int <- data.frame(c(2019, 2020), def.for$pred, L80, U80, L95, U95)
+for.int <- data.frame(c(2019, 2020), exp(def.for$pred), L80, U80, L95, U95)
 ```
 
 ```{r}
-#| tbl-cap: "Intervalos de confianza del modelo ARIMA(1,2,1)"
+#| tbl-cap: "Intervalos de predicción del modelo ARIMA(1,1,0)"
 #| label: tbl-forARIMA
 #| tbl-pos: 'h'
 #| echo: false
 for.int %>% kbl(
   digits = 0,
-  col.names = c('Año', 'pred', 'Lower80', 'Upper80', 'Lower95', 'Upper95')
+  col.names = c('Año', 'predicción', 'Inf80', 'Sup80', 'Inf95', 'Sup95')
 ) %>%
   kable_styling(latex_options = c("striped"))  %>%
   kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
@@ -255,9 +253,9 @@ La @tbl-forARIMA muestra el valor pronosticado para las defunciones totales en l
 
 ```{r}
 #| echo: false
-abs( as.numeric(def.for$pred) - base$defunciones[70:71])
+abs( as.numeric(exp(def.for$pred)) - base$defunciones[70:71])
 ```
-
+Se observa que el valor real para el 2019 es consistente con los intervalos de predicción a ambos niveles de confianza. Para el 2020, se obtiene que el valor real se sale del intervalo al 80%, pero aún así es consistente con el de 95% de confianza. Esto es esperable pues este fue el primer año de pandemia que ocasionó más muertes de que las que se hubiesen dado en caso contrario. 
 
 ### DLM polinomial de orden 1
 
@@ -502,7 +500,8 @@ ggqqplot(data= data.frame(resids),x="resids",
        y = "Cuantiles de muestra")+ 
   theme_minimal_hgrid()
 ```
-De los diagnósticos de los residuos  @fig-diagDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
+
+De los diagnósticos de los residuos @fig-diagDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
 
 
 
@@ -653,13 +652,13 @@ sdDLM2 <-  sqrt(varDLM2)
 
 #Intervalo de confianza al 95%:
 
-U95DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.95/2)
-L95DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.95/2)
+U95DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.05/2)
+L95DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.05/2)
 
 #Intervalo de confianza al 80%:
 
-U80DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.80/2)
-L80DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.80/2)
+U80DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.2/2)
+L80DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.2/2)
 
 datosICDLM2 <- data.frame(c(2019, 2020),forecastDLM2$f  ,L80DLM2, U80DLM2, L95DLM2, U95DLM2)
 
@@ -668,13 +667,13 @@ datosICDLM2 <- data.frame(c(2019, 2020),forecastDLM2$f  ,L80DLM2, U80DLM2, L95DL
 
 
 ```{r}
-#| tbl-cap: "Intervalos de confianza del modelo DLM polinomial orden 2"
+#| tbl-cap: "Intervalos de predicción del modelo DLM polinomial orden 2"
 #| label: tbl-forDlm2
 #| tbl-pos: 'h'
 #| echo: false
 datosICDLM2 %>% kbl(
   digits = 0,
-  col.names = c('Año', 'pred', 'Lower80', 'Upper80', 'Lower95', 'Upper95')
+  col.names = c('Año', 'predicción', 'Inf80', 'Sup80', 'Inf95', 'Sup95')
 ) %>%
   kable_styling(latex_options = c("striped"))  %>%
   kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
@@ -693,5 +692,18 @@ abs( as.numeric(forecastDLM2$f) - base$defunciones[70:71])
 ```
 
 
+## Conclusiones
 
+Ambos modelos estudiados logran hacer pronósticos a dos años de las defunciones que son consistentes con las reales. En el caso del ARIMA, el dato real para el 2020 se sale del intervalo de confianza al 80%, mientras que el DLM polinomial de orden dos logran crear intervalo más certeros. Además, el segundo modelo parece ser menos conservador con las predicciones para la serie utilizada. 
+
+Si bien el modelo DLM polinomial de orden no logra ser tan preciso como el ARIMA para el año 2019, sí logra ser más preciso para el año 2020, mostrando un mejor ajuste para lo que se consideraría un año extraordinario por ser el primer año de pandemia.  
+
+Los pronósticos hechos por el modelo DLM polinimal de orden 1 no resultan útiles producto de la razón señal-ruido tan alta, Sin embargo, este resultado es consistente con el modelo. 
+
+
+## Limitaciones de los modelos
+
+La limitación más clara del modelo ARIMA, es que al hacer pronósticos a largo plazo rápidamente se va a la media del proceso por lo que se imposibilita hacer pronósticos con una ventana de tiempo más amplia de la presentada en este proyecto. 
+
+## UVE Final
 
