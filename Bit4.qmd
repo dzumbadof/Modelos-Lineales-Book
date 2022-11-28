@@ -123,6 +123,7 @@ El decrecimiento gradual del ACF y PACF implica un modelo ARMA(1,1) por lo que l
 #| echo: false
 #| fig-cap: 'Diagnósticos del modelo ARIMA(0,1,1)'
 #| label: fig-diagMa1
+#| message: false
 modelo1 <- sarima(log(serie), 0,1,1)
 ```
 
@@ -130,6 +131,7 @@ modelo1 <- sarima(log(serie), 0,1,1)
 #| echo: false
 #| fig-cap: 'Diagnósticos del modelo ARIMA(1,1,0)'
 #| label: fig-diagAR1
+#| message: false
 modelo2 <- sarima(log(serie), 1,1,0)
 ```
 
@@ -137,6 +139,7 @@ modelo2 <- sarima(log(serie), 1,1,0)
 #| echo: false
 #| fig-cap: 'Diagnósticos del modelo ARIMA(1,1,1)'
 #| label: fig-diagARIMA111
+#| message: false
 modelo3 <- sarima(serie, 1,1,1)
 ```
 Se observa en los diagnósticos que los tres modelos propuestos logran aprobar contundentemente el supuesto de independencia de los residuos mostrado en los gráficos de ACF que ningún rezago tiene significancia. Aún más evidencia para este supuesto es proporcionado por el valor p de la pruebga de Ljung-Box donde se observa un no rechazo de la independencia en los tres modelos. Al observa el qqplot de los residuos en los modelos MA Y AR se observa que la cola izquierda podría ser un problema para la hipótesis de normal, pues estos están al borde de desviarse significativamente de los cuantiles teóricos de la normal. 
@@ -405,6 +408,7 @@ acf_df <-  acf_df[-1,] # Se elimina lag en 0.
 #| echo: false
 #| fig-cap: ' Valores p del estadistico Ljung-Box para el modelo LDM polinomial de orden 1'
 #| label: fig-pvaluesLjBDLM1
+#| message: false
 
 graficoLjungBoxDLM1 <- ggplot(data = acf_df) +
     geom_point(aes(lag,pvalue)) +
@@ -418,6 +422,7 @@ graficoLjungBoxDLM1 + theme_cowplot()
 #| echo: false 
 #| fig-cap: 'Gráfico cuantil-cuantil de los residuos para el modelo DLM polinomial de primer orden'
 #| label: fig-diagqqplotDLM1
+#| message: false
 
  
 # qqnorm(resids)
@@ -493,6 +498,7 @@ forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
 #| echo: false
 #| fig-cap: 'Diagnóstico de residuos para el modelo DLM polinomial de segundo orden'
 #| label: fig-diagDLM2
+#| message: false
 
 
 # Diagnostico de los residuos:
@@ -509,7 +515,7 @@ De los diagnósticos de los residuos @fig-diagDLM2 se osberva del grafico de ACF
 #| echo: false 
 #| fig-cap: 'Gráfico cuantil-cuantil de los residuos para el modelo DLM polinomial de segundo orden'
 #| label: fig-diagqqplotDLM2
-#| 
+#| message: false
 ggqqplot(data= data.frame(resids),x="resids",
   color = "#2C7C7E",size = 1,
   shape = 1, conf.int.level = 0.95)+ 
@@ -543,6 +549,7 @@ acf_df <-  acf_df[-1,] # Se elimina lag en 0.
 #| echo: false
 #| fig-cap: ' Valores p del estadistico Ljung-Box '
 #| label: fig-pvaluesLjBDLM2
+#| message: false
 
 graficoLjungBoxDLM2 <- ggplot(data = acf_df) +
     geom_point(aes(lag,pvalue)) +
