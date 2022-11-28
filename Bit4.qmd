@@ -703,15 +703,8 @@ datosICDLM2 %>% kbl(
 ```
 
 
-En @tbl-forDlm2 se muestran los pronósticos de defunciones realizados por el modelo para el año 2019 y 2020. Se muestran los intervalos de confianza al 80% y 95% de dichos pronósticos. Al comparar con los valores reales de 24292 para el 2019 y 26209 para el 2020 se observa que hay una diferencia de 442 y 644 defunciones aproximadamente.
+En @tbl-forDlm2 se muestran los pronósticos de defunciones realizados por el modelo para el año 2019 y 2020. Se muestran los intervalos de confianza al 80% y 95% de dichos pronósticos. Al comparar con los valores reales de 24292 para el 2019 y 26209 para el 2020 se observa que hay una diferencia de 410 y 719 defunciones aproximadamente.
 
-
-
-
-```{r}
-#| echo: false
-abs( as.numeric(forecastDLM2$f) - base$defunciones[70:71])
-```
 
 
 ## Conclusiones
