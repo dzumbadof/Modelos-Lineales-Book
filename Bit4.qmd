@@ -439,6 +439,17 @@ ggqqplot(data= data.frame(residsDLM1),x="residsDLM1",
 
 ### DLM polinomial de orden 2
 
+El modelo DLM polinomial de orden 2 se decribe mediante las siguientes ecuaciones
+
+\[
+\begin{aligned}
+Y_t &=\theta_{t,1} + v_t, & v_t \sim \mathcal{N}(0, V) \\
+\theta_{t,1} &=\theta_{t-1,1}+ \theta_{t-2,1} +w_{t,1}, & w_{t,1} \sim \mathcal{N}(0, W) \\
+\theta_{t,2} &= \theta_{t-1,2} + w_{t,2}
+\end{aligned}
+\]
+
+Tal como se menciona anteriormente, $(Y_{t})$ es, para efectos del presente análisis, el proceso del total de defunciones anuales de Costa Rica. 
 
 ```{r}
 #| echo: false
@@ -707,7 +718,13 @@ Los pronósticos hechos por el modelo DLM polinimal de orden 1 no resultan útil
 
 ## Limitaciones de los modelos
 
-La limitación más clara del modelo ARIMA, es que al hacer pronósticos a largo plazo rápidamente se va a la media del proceso por lo que se imposibilita hacer pronósticos con una ventana de tiempo más amplia de la presentada en este proyecto. 
+La limitación más clara del modelo ARIMA, es que al hacer pronósticos a largo plazo rápidamente se va a la media del proceso por lo que se imposibilita hacer pronósticos con una ventana de tiempo más amplia de la presentada en este proyecto.
+
+Tal como lo establece @optimalDLM el modelo DLM polinomial de orden 2  ha demostrado ser suficiente para  pronósticos a corto plazo, no obstante una de sus grandes limitaciones al igual que los modelos ARIMA es que los pronósticos a largo plazo son deficientes.Dicho esto concluimos por tanto, en general nuestro estudio está limitado a  pronósticos de defunciones totales a corto plazo.
+
+
+
+
 
 ## UVE Final
 
