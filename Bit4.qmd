@@ -5,7 +5,7 @@
 ### ARIMA
 
 ```{r, R.options, echo=F, include=F, warning=F, message=F}
-options(knitr.kable.NA = '-', echo = F)
+options(knitr.kable.NA = '-', echo = FALSE)
 library(readxl)
 library(kableExtra)
 library(dplyr)
@@ -26,12 +26,11 @@ library(forecast)
 
 #Paquetes para DLM:
 
-library(devtools)
+# library(devtools)
 
-devtools::install_github("https://github.com/cran/dlm")
+#devtools::install_github("https://github.com/cran/dlm")
 
-install.packages("dlm", repos = "https://cran.rstudio.com/", 
-    dependencies = TRUE)
+# install.packages("dlm", repos = "https://cran.rstudio.com/",  dependencies = TRUE)
 
 library(dlm)
 library(ggmcmc) #Para ACF Y PACF DLM .
@@ -294,8 +293,8 @@ ajusteDlmOrden1 <- dlmMLE(serie1980, rep(0, 2), build = DLMOrden1, hessian = TRU
 
 modeloDlmOrden1 <- DLMOrden1(ajusteDlmOrden1$par)
 
-round(modeloDlmOrden1$V, 2)
-round(modeloDlmOrden1$W, 2)
+# round(modeloDlmOrden1$V, 2)
+# round(modeloDlmOrden1$W, 2)
 ```
 
 
@@ -322,7 +321,6 @@ m_{t}=K_{t}y_{t}+(1-K_{t})\,m_{t-1},
 de forma que $K_{t}$ funciona como un peso, y si $\frac{W}{V}$ es grande, entonces $m_{t}$ es "similar" a $y_{t}$ y, por lo tanto, el pronóstico a un paso se parece mucho a la última observación. En un caso extremo en que $V=0$, entonces $m_{t}=y_{t}$, es decir, el pronóstico a un paso es exactamente la observación más reciente. Es precisamente este fenómeno el que podría estar desembocando en el poco provecho del modelo en términos de sus pronósticos. 
 
 ```{r, echo=FALSE}
-
 #| echo: false 
 
 DLMOrden1 <- function(parm) {
@@ -336,7 +334,7 @@ ajusteDlmOrden1 <- dlmMLE(serie1980, rep(0, 2), build = DLMOrden1, hessian = TRU
 filtroDLM1 <-  dlmFilter(serie1980, mod = modeloDlmOrden1)
 # Se realiza el pronóstico
 forecastDLM1 <-  dlmForecast(mod = filtroDLM1, nAhead = 2)
-forecastDLM1$f
+# forecastDLM1$f
 ```
 
 ```{r Pronóstico DLM orden 1}
@@ -350,7 +348,7 @@ filtroDLM1 <-  dlmFilter(serie1980, mod = modeloDlmOrden1)
 
 forecastDLM1 <-  dlmForecast(mod = filtroDLM1, nAhead = 2)
 
-forecastDLM1
+# forecastDLM1
 
 
 ```
@@ -492,7 +490,15 @@ resids <-  residuals(filtroDLM2, sd = FALSE)
 # Hacen varios plots para el chequeo de residuos.
 checkresiduals( resids, test = F) + theme_minimal()
 
+```
 
+De los diagnósticos de los residuos @fig-diagDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
+
+```{r}
+#| echo: false 
+#| fig-cap: 'Gráfico cuantil-cuantil de los residuos para el modelo DLM polinomial de segundo orden'
+#| label: fig-diagqqplotDLM2
+#| 
 ggqqplot(data= data.frame(resids),x="resids",
   color = "#2C7C7E",size = 1,
   shape = 1, conf.int.level = 0.95)+ 
@@ -500,8 +506,6 @@ ggqqplot(data= data.frame(resids),x="resids",
        y = "Cuantiles de muestra")+ 
   theme_minimal_hgrid()
 ```
-
-De los diagnósticos de los residuos @fig-diagDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
 
 
 
