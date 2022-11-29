@@ -22,7 +22,6 @@ library(ggpubr) # qqplots en ggplot2
 library(astsa)
 library(tseries)
 library(forecast)
-library()
 
 
 #Paquetes para DLM:
@@ -104,7 +103,7 @@ De la @fig-acfRegresion se observa que logramos obtener residuos que lucen estac
 modelo1 <- sarima(serie, 1,0,0, xreg=time(serie))
 ```
 
-```{r}
+```{r results='hide',fig.keep='all'}
 #| echo: false
 #| fig-cap: 'Diagnósticos del modelo con componente ARMA(0,1)'
 #| label: fig-diagARMA01
@@ -112,7 +111,7 @@ modelo1 <- sarima(serie, 1,0,0, xreg=time(serie))
 modelo2 <- sarima(serie, 0,0,1, xreg=time(serie))
 ```
 
-```{r}
+```{r results='hide',fig.keep='all'}
 #| echo: false
 #| fig-cap: 'Diagnósticos del modelo ARMA(0,2)'
 #| label: fig-diagARMA02
@@ -471,7 +470,7 @@ forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
 ```
 
 
-```{r}
+```{r results='hide',fig.keep='all'}
 #| echo: false
 #| fig-cap: 'Diagnóstico de residuos para el modelo DLM polinomial de segundo orden'
 #| label: fig-diagDLM2
@@ -501,7 +500,7 @@ ggqqplot(data= data.frame(resids),x="resids",
   theme_minimal_hgrid()
 ```
 
-
+De la @fig-diagqqplotDLM2 se ve que el ajuste normal es bueno salvo hacia la cola izquierda.
 
 ```{r}
 #| echo: false
