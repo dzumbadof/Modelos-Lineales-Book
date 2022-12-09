@@ -9,11 +9,12 @@ book:
   #date: "10/4/2022"
   chapters:
     - index.qmd
-    - Bit1.qmd
-    - Bit2.qmd
-    - Bit3.qmd
-    - Bit4.qmd
-    #- Anteproyecto.qmd
+    # - Bit1.qmd
+    # - Bit2.qmd
+    # - Bit3.qmd
+    # - Bit4.qmd
+    # - Anteproyecto.qmd
+    - Proyecto.qmd
     - references.qmd
 
 bibliography: references.bib
@@ -33,6 +34,9 @@ format:
     lof: true
     lot: true
     fig-pos: 'H'
+    fig-width: 8.8
+    fig-height: 5.5
+    fig-format: pdf	
     number-sections: false
 
 
