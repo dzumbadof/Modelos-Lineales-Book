@@ -24,6 +24,8 @@ format:
   html:
     theme: cosmo
   pdf:
+    mainfont: "Calibri"
+    fontsize: 11pt
     documentclass: report
     classoption: ["onepage", "openany"]
     template-partials:
@@ -34,9 +36,9 @@ format:
     toc: true
     lof: true
     lot: true
-    fig-pos: 'H'
-    fig-width: 8.8
-    fig-height: 5.5
+    #fig-pos: 'H'
+    fig-width: 4.8
+    fig-height: 3
     fig-format: pdf	
     number-sections: false
 
