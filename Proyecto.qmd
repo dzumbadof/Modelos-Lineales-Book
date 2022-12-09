@@ -57,13 +57,16 @@ Esta teoría establece que los principales factores causantes de las transicione
 
 Es importante mencionar que tal como lo establece @mariscal2018tres la TTE, tiene como objeto de estudio la mortalidad, ya que se centra en aspectos como: patrones de enfermedad, causas de las muertes y la interacción de estas con patrones demográficos, económicos y sociológicos.
 
+
+Como antecedentes, se observa que en múltiples investigaciones con temáticas relacionadas a defunciones como el de  @adekambi  y el estudio por @ordorika, se implementan modelos para el pronóstico de series defunciones mediante distintos enfoques, entre ellos pronóstico mediante el empleo de modelos ARIMA, sin embargo estudios más recientes hacen uso de los Modelos Dinámicos Lineales. 
+
 Tal como lo establece  @petrisDLM entre los modelos más utilizados para el análisis de series temporales se encuentra la clase de modelos de media móvil autorregresiva (ARMA). Para enteros, no negativos $p$ y $q$, un modelo ARMA$(p,q)$ es definido mediante la notación:
 
 $$Y_{t} = \mu + \sum_{j=1}^{p}\phi_{j}(Y_{t-j} - \mu ) +  \sum_{j=1}^{p}\psi_{j}\epsilon_{t-j} + \epsilon_{t}$$
 
 Donde $(\epsilon_{t})$ es una ruido blanco Gaussiano con varianza $\sigma_{\epsilon}^{2}$ y los parámetros $\phi_{1}, \phi_{2}, ..., \phi_{p}$  satisfacen la condición de estacionariedad.
 
-Cuando los datos no presentan estacionariedad, se suele tomar las diferencias hasta que se obtenga esta, una vez obtenida se procede a ajustar el modelo ARMA$(p,q)$ a la data diferenciada.
+Cuando los datos no presentan estacionariedad, se suele tomar las diferencias hasta que se obtenga esta, una vez obtenida se procede a ajustar el modelo ARMA$(p,q)$ a los datos diferenciados.
 
 Un modelo para un proceso cuya $d$-ésima diferencia sigue un modelo ARMA$(p,q)$ es llamado un ARIMA$(p ,d,q)$.  
 
@@ -112,7 +115,6 @@ Y_t &=\theta_{t,1} + v_t, & v_t \sim \mathcal{N}(0, V) \\
 \theta_{t,2} &= \theta_{t-1,2} + w_{t,2}
 \end{aligned}
 \]
-
 
 
 
