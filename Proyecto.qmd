@@ -92,9 +92,7 @@ $$f_{t}(k) = {E}[Y_{t+k}|D_{t} ] =F_{t+k}a_{t}(k)$$
 
 $$Q_{t}(k)= {Var}[Y_{t+k}|D_{t} ]  =F_{t+k}R_{t}(k)F^{'}_{t+k} + V_{t+k}$$
 
-### DLM polinomial de orden 1
-
-Este modelo está descrito por el par de ecuaciones:
+El DLM polinomial de orden 1 es descrito por el par de ecuaciones:
 \[
 \begin{aligned}
 Y_t &=\mu_t+v_t, & v_t \sim \mathcal{N}(0, V) \\
@@ -105,9 +103,7 @@ Y_t &=\mu_t+v_t, & v_t \sim \mathcal{N}(0, V) \\
 donde $(Y_{t})$ es, para efectos del presente análisis, el proceso del total de defunciones anuales de Costa Rica. 
 
 
-### DLM polinomial de orden 2
-
-El modelo DLM polinomial de orden 2 se describe mediante las siguientes ecuaciones
+Por otro lado, el modelo DLM polinomial de orden 2 se describe mediante las siguientes ecuaciones:
 
 \[
 \begin{aligned}
