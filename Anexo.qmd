@@ -1,0 +1,358 @@
+# Anexo
+
+## Código 
+
+### Carga de paquetes
+
+```{r, R.options, include=T, warning=F, message=F}
+options(knitr.kable.NA = '-', echo = FALSE)
+library(readxl)
+library(kableExtra)
+library(dplyr)
+library(janitor)
+library(ggplot2)
+library(wesanderson)
+library(cowplot)
+library(viridis)
+library(GGally)
+library(scales)
+library(ggplot2)
+library(ggpubr) # qqplots en ggplot2
+#Paquetes para series de tiempo
+library(astsa)
+library(tseries)
+library(forecast)
+
+
+#Paquetes para DLM:
+
+# library(devtools)
+
+#devtools::install_github("https://github.com/cran/dlm")
+
+# install.packages("dlm", repos = "https://cran.rstudio.com/",  dependencies = TRUE)
+
+library(dlm)
+library(ggmcmc) #Para ACF Y PACF DLM .
+```
+
+### Carga de datos y depuración
+
+```{r}
+#| warning: false
+base <- data.frame(read_excel("sepoblacev1950-2020_0.xls", 
+    range = "B9:S80", col_types = "numeric"))
+
+colnames(base) <- c("Año",
+                    "Población total",
+                    "Población de hombres",
+                    "Población de mujeres",
+                    "Nacimientos",
+                    "Defunciones",
+                    "Defunciones infantiles",
+                    "Defunciones neonatales",
+                    "Defunciones fetales",
+                    "Tasa de crecimiento",
+                    "Tasa de natalidad",
+                    "Tasa de mortalidad",
+                    "Tasa de mortalidad infantil",
+                    "Tasa de mortalidad neonatal",
+                    "Tasa de mortalidad fetal",
+                    "Tasa global de fecundidad",
+                    "Tasa bruta de reproducción",
+                    "Tasa neta de reproducción"				
+)
+
+base <- base %>% clean_names()
+```
+
+### Modelo SARIMA
+
+División del conjunto de entrenamiento y de prueba. 
+
+```{r}
+entrenamiento <- base$defunciones[30:69]
+serie <- ts( entrenamiento, start=c(1980,1), frequency=1)
+```
+
+Gráficos de la serie de tiempo
+
+```{r}
+#| fig-cap: "Serie de tiempo de defunciones totales"
+#| label: fig-serieDefunciones
+#| fig-cap-location: top
+plot(serie, main="", xlab="Tiempo", ylab='Defunciones totales')
+```
+
+Implemenatación de los modelos SARIMA y diagnósticos
+
+```{r}
+#| fig-cap: "ACF y PACF de los residuos de la regresión"
+#| label: fig-acfRegresion
+#| fig-cap-location: top
+fit1 <- lm(serie ~ time(serie))
+t <- acf2(resid(fit1), main='')
+```
+
+
+```{r results='hide', fig.keep='all'}
+#| fig-cap: 'Diagnósticos del modelo con componentente ARMA(1,0)'
+#| label: fig-diagAR1
+#| message: false
+modelo1 <- sarima(serie, 1,0,0, xreg=time(serie))
+```
+
+```{r results='hide',fig.keep='all'}
+#| fig-cap: 'Diagnósticos del modelo con componente ARMA(0,1)'
+#| label: fig-diagARMA01
+#| message: false
+modelo2 <- sarima(serie, 0,0,1, xreg=time(serie))
+```
+
+```{r results='hide',fig.keep='all'}
+#| fig-cap: 'Diagnósticos del modelo ARMA(0,2)'
+#| label: fig-diagARMA02
+#| message: false
+modelo3 <- sarima(serie, 0,0,2, xreg=time(serie))
+```
+
+Pronóstico
+
+```{r}
+#| fig-cap: 'Pronóstico del modelo con componente ARMA(1,0) de las defunciones totales'
+#| label: fig-pronosticoARIMA
+def.for <- sarima.for(serie, n.ahead = 2, 1,0,0, xreg=time(serie), 
+                      newxreg = c(2019,2020))
+```
+
+Intervalos de predicción
+
+```{r}
+#Al 95%
+U95 <- def.for$pred + def.for$se*qnorm(1-0.05/2)
+L95 <- def.for$pred - def.for$se*qnorm(1-0.05/2)
+
+#Al 80%
+U80 <- def.for$pred + def.for$se*qnorm(1-0.2/2)
+L80 <- def.for$pred - def.for$se*qnorm(1-0.2/2)
+
+
+for.int <- data.frame(c(2019, 2020), def.for$pred, L80, U80, L95, U95)
+```
+
+### Modelo DLM polinomial de primer grado
+
+```{r Estimación DLM orden 1}
+#| output: false
+serie1980 <- window(serie, start=1980)
+
+# serie_insumo <- window( serie, end = 1979)
+# m0_prueba = mean(serie_insumo)
+# C0_prueba = var(serie_insumo)
+
+# Se crea la estructura del modelo DLM orden 1:
+
+DLMOrden1 <- function(parm) {
+      dlmModPoly(order = 1, dV = exp(parm[1]), dW = exp(parm[2]))
+}
+
+# Se procede hacer ajuste de parametros vía maxima verosimilitud:
+
+ajusteDlmOrden1 <- dlmMLE(serie1980, rep(0, 2), build = DLMOrden1, hessian = TRUE)
+
+
+# Se crea el modelo con los parametros obtenidos vía maxima verosimilitud:
+
+modeloDlmOrden1 <- DLMOrden1(ajusteDlmOrden1$par)
+
+# round(modeloDlmOrden1$V, 2)
+# round(modeloDlmOrden1$W, 2)
+```
+
+```{r}
+#| output: false
+DLMOrden1 <- function(parm) {
+      dlmModPoly(order = 1, 
+                 dV = exp(parm[1]), 
+                 dW = exp(parm[2]))
+}
+# Ajuste máxima verosimilitud
+ajusteDlmOrden1 <- dlmMLE(serie1980, rep(0, 2), build = DLMOrden1, hessian = TRUE)
+# Se aplica el filtro de Kalman:
+filtroDLM1 <-  dlmFilter(serie1980, mod = modeloDlmOrden1)
+# Se realiza el pronóstico
+forecastDLM1 <-  dlmForecast(mod = filtroDLM1, nAhead = 2)
+# forecastDLM1$f
+```
+
+Pronósticos 
+
+```{r Pronóstico DLM orden 1}
+#| output: false
+# Se aplica el filtro de Kalman:
+
+filtroDLM1 <-  dlmFilter(serie1980, mod = modeloDlmOrden1)
+
+# Procedemos a hacer forecast, en este caso se hace se hace forecating 2 pasos adelante.
+
+forecastDLM1 <-  dlmForecast(mod = filtroDLM1, nAhead = 2)
+
+# forecastDLM1
+```
+
+Diagnósticos 
+
+```{r Diagnósticos}
+#| fig-cap: 'Algunos diagnósticos descriptivos de los residuos para el modelo DLM polinomial de primer orden'
+#| label: fig-diagDLM1
+
+
+residsDLM1 <- residuals(filtroDLM1, sd = FALSE)
+# checkresiduals( resids, test = F)
+
+with_theme_cowplot <- function(expr) {
+  orig <- theme_get()
+  theme_set(theme_cowplot())
+  force(expr)
+  theme_set(orig)
+}
+g <- with_theme_cowplot(checkresiduals( residsDLM1, test = F, lag = 40))
+
+```
+
+
+```{r}
+#| output: false
+# Se crea codigo para plotear los p values del estadistico Ljung-Box:
+
+
+acfLDM1 <- acf(residsDLM1, plot = F)
+
+acf_df <- data.frame(
+  acf = acfLDM1$acf,
+  lag = acfLDM1$lag
+)
+
+
+#Se calculan los p values del estadistico:
+acf_df$pvalue <- sapply(acf_df$lag, function(i) Box.test(residsDLM1, lag=i, type="Ljung-Box")$p.value)
+
+acf_df <-  acf_df[-1,] # Se elimina lag en 0.
+
+```
+
+
+### Modelo DLM polinomial de segundo orden
+
+Implementación del modelo
+
+```{r}
+#| output: false
+#Se crea la estructura del modelo DLM orden 2:
+DLMOrden2 <- function(parm) {
+    dlmModPoly(order = 2, dV = exp(parm[1]), dW = exp(parm[2:3]))
+           
+}
+#Se procede hacer ajuste de parametros via maxima verosimilitud:
+
+ajusteDlmOrden2 <- dlmMLE(serie, rep(0, 3), build = DLMOrden2 , hessian = TRUE)
+
+
+#Se crea el modelo con los parametros obtenidos via maxima verosimilitud:
+
+modeloDlmOrden2 <- DLMOrden2(ajusteDlmOrden2$par)
+```
+
+```{r}
+#| output: false
+#Se aplica filtro de Kalman:
+
+filtroDLM2 <-  dlmFilter(serie, mod = modeloDlmOrden2  )
+
+
+#Procedemos hacer forecast, en este caso se hace se hace forecating 2 pasos adelante.
+
+
+forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
+
+```
+
+Diagnósticos de residuos
+
+```{r results='hide',fig.keep='all'}
+#| output: false
+#| fig-cap: 'Diagnóstico de residuos para el modelo DLM polinomial de segundo orden'
+#| label: fig-diagDLM2
+#| message: false
+
+
+# Diagnostico de los residuos:
+
+resids <-  residuals(filtroDLM2, sd = FALSE)
+# Hacen varios plots para el chequeo de residuos.
+checkresiduals( resids, test = F) + theme_minimal()
+
+```
+
+Diagnósticos adicionales y pruebas de bondad de ajuste
+
+```{r}
+#| output: false
+#Se calcula el AIC, BIC y AICc 
+loglikDLM2 <- dlmLL(serie, dlmModPoly(2))
+numeroParametros <- 3
+n <- length(serie)
+AICDLM2 <- 2 * (numeroParametros) - 2*log(loglikDLM2)  
+BICDLM2 <- (log(n)) * (numeroParametros)- 2*log(loglikDLM2)
+
+AICcDLM2 <-  AICDLM2 + (2*(numeroParametros^(2) + numeroParametros))  /(n- numeroParametros-1)
+
+
+#Se aplica el test Box-Ljung:
+
+LjungTestDLM2 <-  Box.test(resids, lag = 12, type = "Ljung") 
+# Valor p del test Box-Ljung:
+valorPLjungTestDLM2 <-  LjungTestDLM2$p.value
+# estadistico del test Box-Ljung Q:
+
+estadPLjungTestDLM2 <- LjungTestDLM2$statistic
+
+
+#Se aplica el test Shapiro:
+
+ShapiTestDLM2 <-  shapiro.test(resids) 
+# Valor p del test Shapiro:
+valorPShapiTestDLM2 <-  ShapiTestDLM2$p.value
+
+# estadistico del test Shapiro W:
+
+estadShapiTestDLM2 <- ShapiTestDLM2$statistic
+```
+
+Intervalos de predicción
+
+```{r}
+#| output: false
+#Se construyen intervalos de confianza para DLM polinomial orden 2:
+
+#Varianza:
+
+varDLM2 <-  unlist( forecastDLM2$Q)
+
+#Desviacion estandar:
+
+sdDLM2 <-  sqrt(varDLM2)
+
+#Intervalo de confianza al 95%:
+
+U95DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.05/2)
+L95DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.05/2)
+
+#Intervalo de confianza al 80%:
+
+U80DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.2/2)
+L80DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.2/2)
+
+datosICDLM2 <- data.frame(c(2019, 2020),forecastDLM2$f  ,L80DLM2, U80DLM2, L95DLM2, U95DLM2)
+```
+
