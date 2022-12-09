@@ -324,95 +324,599 @@ g
 
 ```
 
-# Modelos estadísticos propuestos
 
 
-Con la finalidad de realizar un pronóstico de la serie de defunciones totales anuales de Costa Rica, se desea implementar el modelo estadístico que mejor se ajuste a los datos.
+# Métodos y resultados
 
-Para nuestro estudio en cuestión, se ha optado por realizar una implementación de Modelos de Espacio-Estado.Particularmente, 
- Modelos Dinámicos Lineales (DLM). 
+Primero, la @fig-serieDefunciones muestra la serie de tiempo de defunciones totales. Se muestra un comportamiento creciente de carácter lineal, por lo que se busca ajustar un modelo de la forma
 
-Tal como lo establece @petrisDLM, estos últimos son una clase de Modelos de Espacio-Estado también llamados Modelos de Espacio-Estado Lineales Gaussianos. Estos modelos son especificados mediante dos ecuaciones, para $t \geq 1$ se tiene:
+$$D_t = \beta_0 + \beta_1t + x_T$$
+Donde $D_t$ representa las defunciones totales, $t$ es el tiempo y $x_t$ es un proceso ARMA.
 
-$$ Y_{t}= F_{t} \theta_{t} + v_{t} , $$
-$$  \theta_{t}= G_{t} \theta_{t-1} + w_{t}   $$
+```{r}
+#| fig-cap: "Serie de tiempo de defunciones totales"
+#| label: fig-serieDefunciones
+#| fig-cap-location: top
+#| echo: false
+plot(serie, main="", xlab="Tiempo", ylab='Defunciones totales')
+```
 
-$$   (\theta_{0}|D_{0}) \sim \mathcal{N}(m_{0},C_{0})    $$
+```{r}
+#| fig-cap: "ACF y PACF de los residuos de la regresión"
+#| label: fig-acfRegresion
+#| fig-cap-location: top
+#| echo: false
+fit1 <- lm(serie ~ time(serie))
+t <- acf2(resid(fit1), main='')
+```
 
-Donde la primer ecuación es llamada ecuación de observación,la segunda ecuación estado o ecuación del sistema y la última información inicial. 
+De la @fig-acfRegresion se observa que logramos obtener residuos que lucen estacionarios. Además, parece que el PACF se trunca después del primer rezago, mientras que el ACF decrece. Esto sugiere fuertemente un modelo autoregresivo AR(1). Tambiés es posible que se trunque el ACF luego del primer o segundo rezago, mientras que el ACF decrece, por lo que también se tienen los modelos candidatos MA(1) Y MA(2)
 
-Es importante señalar que $F_{t}$ y $G_{t}$ son matrices y $(v_{t})$ , $(w_{t})$ son secuencias de ruidos blancos independientes tales que:
+```{r results='hide', fig.keep='all'}
+#| echo: false
+#| fig-cap: 'Diagnósticos del modelo con componentente ARMA(1,0)'
+#| label: fig-diagAR1
+#| message: false
+modelo1 <- sarima(serie, 1,0,0, xreg=time(serie))
+```
 
-$$ v_{t} \sim \mathcal{N}_{m}(0,V_{t}) , $$
-$$  w_{t} \sim \mathcal{N}_{p}(0,W_{t})  $$
+```{r results='hide',fig.keep='all'}
+#| echo: false
+#| fig-cap: 'Diagnósticos del modelo con componente ARMA(0,1)'
+#| label: fig-diagARMA01
+#| message: false
+modelo2 <- sarima(serie, 0,0,1, xreg=time(serie))
+```
 
-Los DLM poseen dos supuestos, la linealidad y el supuesto de distribuciones Gaussianas. @petrisDLM señala que este último supuesto puede ser justificado mediante argumentos del teorema del límite central.
+```{r results='hide',fig.keep='all'}
+#| echo: false
+#| fig-cap: 'Diagnósticos del modelo ARMA(0,2)'
+#| label: fig-diagARMA02
+#| message: false
+modelo3 <- sarima(serie, 0,0,2, xreg=time(serie))
+```
 
+```{r}
+#| echo: false
+Componente <- c('ARMA(1,0)', 'ARMA(0,1)' , 'ARMA(0,2)') 
+W <- rep(NA, 3) #estadistico de Shapiro-Wilks
+SWp <- rep(NA,3) #Valor p de prueba Shapiro-Wilks
 
-La estimación y pronóstico se pueden resolver calculando las distribuciones condicionales de las cantidades de interés, dada la información disponible. Para estimar el vector de estados es necesario computar la densidad condicional $p(\theta_{t} |y_{1}, .., y_{t})$. En particular, nos interesa el problema de filtrado (cuando $s=t$), donde los datos se supone que llegan secuencialmente en el tiempo.
+Q <- rep(NA,3) #estadistico de Ljung-Box
+LBp <- rep(NA,3) #valor p de prueba de Ljung-Box
+```
 
-En general, el problema de pronóstico de $k$-pasos hacia adelante consiste en estimar la evolución del sistema $\theta_{t+k}$ para $k \geq 1$ y realizar un pronóstico de $k$-pasos para $Y_{t+k}$.
+```{r}
+#| echo: false  
+# Pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia
 
-Según @petrisDLM en los DLM, el filtro de Kalman proporciona las fórmulas para actualizar nuestra inferencia actual sobre el vector de estado conforme se disponga de nuevos datos. 
+#Modelo ARIMA(0,1,1)
+std.innov <- modelo1$fit$residuals/sqrt(modelo1$fit$sigma2)
+W[1] <- shapiro.test(std.innov)$statistic
+SWp[1] <- shapiro.test(std.innov)$p.value
+Q[1] <- Box.test(std.innov, type='Ljung')$statistic
+LBp[1] <- Box.test(std.innov, type='Ljung')$p.value
 
-Para un DLM, si se cumple que:
+#Modelo ARIMA(1,1,0)
+std.innov <- modelo2$fit$residuals/sqrt(modelo2$fit$sigma2)
+W[2] <- shapiro.test(std.innov)$statistic
+SWp[2] <- shapiro.test(std.innov)$p.value
+Q[2] <- Box.test(std.innov, type='Ljung')$statistic
+LBp[2] <- Box.test(std.innov, type='Ljung')$p.value
 
-$$ \theta_{t} | \mathcal{D}_{t} \sim \mathcal{N}(m_{t}, C_{t}) , t \geq 1 $$
+#Modelo ARIMA(1,1,1)
+std.innov <- modelo3$fit$residuals/sqrt(modelo3$fit$sigma2)
+W[3] <- shapiro.test(std.innov)$statistic
+SWp[3] <- shapiro.test(std.innov)$p.value
+Q[3] <- Box.test(std.innov, type='Ljung')$statistic
+LBp[3] <- Box.test(std.innov, type='Ljung')$p.value
+```
 
-Se tiene que:
+```{r}
+#| echo: false
+# AIC Y BIC de los modelos
 
-La densidad de predicción de estado de $k$-pasos con  $k \geq 1$ hacia adelante de $\theta_{t+k}$ dada  la información pasada $D_{t}$ es Gaussiana  con media y varianza condicional dadas respectivamente por:
-
-$$  a_{t}(k) = {E}[\theta_{t+k}|D_{t} ] = G_{t+k}a_{t, k-1}  $$
-$$ R_{t}(k)= {Var}[\theta_{t+k}|D_{t} ] =G_{t+k}R_{t,k-1}G^{'}_{t+k} + W_{t+k} $$
-
-La densidad de predicción de $k$-pasos con  $k \geq 1$ hacia adelante de $Y_{t+k}$ dada  la información pasada $D_{t}$, es Gaussiana  con media y varianza condicional dadas respectivamente por:
-
-$$  f_{t}(k) = {E}[Y_{t+k}|D_{t} ] =F_{t+k}a_{t}(k) $$
-$$ Q_{t}(k)= {Var}[Y_{t+k}|D_{t} ]  =F_{t+k}R_{t}(k)F^{'}_{t+k} + V_{t+k} $$
-
-
-## Justificación modelos DLM propuestos
-
-
-Como se mencionó en @fig-defunciones_ano, la cantidad de defunciones totales siguen una cierta tendencia lineal creciente, en particular para años posteriores a 1980.
-
-Debido a que esta es nuestra variable de interés para realizar un pronóstico, es propicio para nuestro estudio en cuestión la implementación de un modelo con supuesto de linealidad, como se mencionó justamente los DLM siguen este supuesto.
-
-Para llevar a cabo los pronósticos se proponen por tanto tres métodos estadísticos pertenecientes a los DLM, estos son: modelo DLM polinomial de primer orden, modelo DLM polinomial de segundo orden y el modelo ARIMA$(p,d,q)$.
-
-
-## Modelo ARIMA$(p,d,q)$
-
-Como una primer implementación se utiliza un modelo ARIMA$(p ,d,q)$. Tal como lo menciona @petrisDLM un modelo ARIMA$(p ,d,q)$ puede ser considerado un DLM, esto ya que es posible representar todo modelo ARIMA($p$,$d$,$q$) (ya sea univariado o multivariado) como un DLM. 
-
-La escogencia de este modelo al ser un DLM, sigue la misma línea de justificación antes mencionado sobre la elección de modelos DLM para nuestro estudio, siendo este un caso particular de estos.
-
-Sin embargo, es importante mencionar que la escogencia de este modelo como primera implementación también se basa en su simplicidad, y en que dada la bibliografía consultada, se observa que en múltiples investigaciones con temáticas relacionadas a nuestro estudio como el de  @adekambi  y el estudio por @ordorika, se implementa este tipo de modelo.
-
-
-Tal como lo establece  @petrisDLM entre los modelos más utilizados para el análisis de series temporales se encuentra la clase de modelos de media móvil autorregresiva (ARMA). Para enteros, no negativos $p$ y $q$, un modelo ARMA$(p,q)$ es definido mediante la notación:
-
-$$ Y_{t} = \mu + \sum_{j=1}^{p}\phi_{j}(Y_{t-j} - \mu ) +  \sum_{j=1}^{p}\psi_{j}\epsilon_{t-j} + \epsilon_{t} $$
-
-Donde $(\epsilon_{t})$ es una ruido blanco Gaussiano con varianza $\sigma_{\epsilon}^{2}$ y los parámetros 
- $\phi_{1}, \phi_{2}, ..., \phi_{p}$  satisfacen la condición de estacionariedad.
-
-Cuando los datos no presentan estacionariedad, se suele tomar las diferencias hasta que se obtenga esta, una vez obtenida se procede a ajustar el modelo ARMA$(p,q)$ a la data diferenciada.
-
-Un modelo para un proceso cuya $d$-ésima diferencia sigue un modelo ARMA$(p,q)$ es llamado un ARIMA$(p ,d,q)$.  
-
-La escogencia de los ordenes $p$ y $q$ pueden ser escogidos de una manera informal, observando la autocorrelación empírica y la autocorrelación parcial, o utilizando un criterio de selección de modelos más formal como lo es el AIC y BIC.
-
-
-## Modelos polinomiales de primer y segundo orden
+AIC <- c(modelo1$AIC, modelo2$AIC, modelo3$AIC)
+BIC <- c(modelo1$BIC, modelo2$BIC, modelo3$BIC)
+AICc <- c(modelo1$AICc, modelo2$AICc, modelo3$AICc)
+```
 
 
-Se propone un modelo DLM de primer orden ya que como establece @optimalDLM los DLM de primer orden son algoritmos recomendados al lidiar con datos anuales debido a que las series de tiempo es corta y no presentan patrones estacionales.Dado que nuestros datos son anuales, este modelo se presenta como un posible candidato.
+```{r}
+#| tbl-cap: "Resumen de diagnósticos de los modelos propuestos"
+#| label: tbl-diagARIMA
+#| tbl-pos: 'h'
+#| echo: false
+data.frame(Componente, W, SWp, Q, LBp, AIC, BIC, AICc) %>%
+  kbl(
+    digits = 2,
+    col.names = c(
+      'Modelo',
+      'Estadístico W',
+      "Valor p Shapiro-Wilks",
+      "Estadístico Q",
+      "Valor p Ljung-Box",
+      "AIC",
+      "BIC",
+      "AICc"
+    )
+  ) %>%
+  kable_styling(latex_options = c("striped"))  %>%
+  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
+                                                                     TRUE)
+```
 
-Por su parte @optimalDLM, señala que los DLM de segundo orden son útiles para describir tendencias. Dada la tendencia observada de la serie de defunciones totales sugiere por tanto realizar un modelo  polinomial de segundo orden.
+La @tbl-diagARIMA resume las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Se da un no rechazo de las hipótesis nulas de independencia y normalidad de los residuos en el primer y tercer modelo. Además, se da un rechazo de la hipótesis de normalidad e independencia de los residuos en el segundo modelo. El modelo autoregresivo presenta las mejores medidas de AIC, AICc y BIC, aparte de ser el más parsimonioso de los tres. Por esta razón se decide escoger el modelo con componente ARMA(1,0) para hacer el pronóstico.
 
-Es oportuno señalar que el desarrollo teórico de estos modelos se llevará a cabo en bitácoras posteriores, ya que se considera prudente primero realizar la implementación de estos (tal como se realizó  el ARIMA$(p,d,q)$) para ver sus alcances para responder la pregunta de investigación. 
+```{r}
+#| fig-cap: 'Pronóstico del modelo con componente ARMA(1,0) de las defunciones totales'
+#| label: fig-pronosticoARIMA
+#| echo: false
+def.for <- sarima.for(serie, n.ahead = 2, 1,0,0, xreg=time(serie), 
+                      newxreg = c(2019,2020))
+```
+
+```{r}
+#| echo: false
+# Intervalos de confianza
+U95 <- def.for$pred + def.for$se*qnorm(1-0.05/2)
+L95 <- def.for$pred - def.for$se*qnorm(1-0.05/2)
+
+U80 <- def.for$pred + def.for$se*qnorm(1-0.2/2)
+L80 <- def.for$pred - def.for$se*qnorm(1-0.2/2)
+
+
+for.int <- data.frame(c(2019, 2020), def.for$pred, L80, U80, L95, U95)
+```
+
+```{r}
+#| tbl-cap: "Intervalos de predicción del modelo ARIMA(1,1,0)"
+#| label: tbl-forARIMA
+#| tbl-pos: 'h'
+#| echo: false
+for.int %>% kbl(
+  digits = 0,
+  col.names = c('Año', 'predicción', 'Inf80', 'Sup80', 'Inf95', 'Sup95')
+) %>%
+  kable_styling(latex_options = c("striped"))  %>%
+  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
+                                                                     TRUE)
+```
+
+La @tbl-forARIMA muestra el valor pronosticado para las defunciones totales en los años 2019 y 2020 y los intervalos de confianza al 80% y 95%. Al comparar con los valores reales de 24292 para el 2019 y 26209 para el 2020, se observa que el valor real para el 2019 es consistente con el intervalo de confianza al 95%, pero no al 80%. Por su parte, el valor real para el 2020 se sale de los intervalos a ambos niveles de confianza. Esto es esperable pues el primer año de pandemia tuvo una cantidad inusualmente alta de muertes. La diferencia entre los valores predichos y los reales para el 2019 y 2020 son dados por
+
+```{r}
+#| echo: false
+abs( as.numeric(def.for$pred) - base$defunciones[70:71])
+```
+
+
+Para utilizar un DLM polinomial de orden 1, se empieza por estimar los parámetros $V$ y $W$ correspondientes a la varianza de el ruido blanco gaussiano aditivo en las ecuaciones observada y del sistema, respectivamente. Esto se lleva a cabo por máxima verosimilitud, y se obtiene $\hat{V}=0.37$ y $\hat{W}=304117$. Nótese la gran diferencia en escala entre ambas varianzas. En @petrisDLM se advierte que este modelo en particular es muy sensible respecto al valor de la razón $\frac{W}{V}$, llamada *radio señal-ruido*. Cabe mencionar también que este proceso se comporta asintóticamente como un ARIMA(0,1,1) [@petrisDLM].
+
+
+```{r Estimación DLM orden 1, echo=FALSE}
+#| echo: false
+
+serie1980 <- window(serie, start=1980)
+
+# serie_insumo <- window( serie, end = 1979)
+# m0_prueba = mean(serie_insumo)
+# C0_prueba = var(serie_insumo)
+
+# Se crea la estructura del modelo DLM orden 1:
+
+DLMOrden1 <- function(parm) {
+      dlmModPoly(order = 1, dV = exp(parm[1]), dW = exp(parm[2]))
+}
+
+# Se procede hacer ajuste de parametros vía maxima verosimilitud:
+
+ajusteDlmOrden1 <- dlmMLE(serie1980, rep(0, 2), build = DLMOrden1, hessian = TRUE)
+
+
+# Se crea el modelo con los parametros obtenidos vía maxima verosimilitud:
+
+modeloDlmOrden1 <- DLMOrden1(ajusteDlmOrden1$par)
+
+# round(modeloDlmOrden1$V, 2)
+# round(modeloDlmOrden1$W, 2)
+```
+
+
+Una vez obtenidos estos parámetros, se procede a aplicar el filtro de Kalman y con este se realiza el pronóstico de la cantidad total de defunciones para 2019 y 2020, donde se encuentra un inconveniente: para ambos años, el pronóstico es de 23786 defunciones. Más aún, esta cantidad es justamente el total de defunciones en  2018. Sin duda esto representa una gran desventaja de este modelo pues claramente no resulta útil en términos de predicción, incluso teniendo en cuenta que solo es prudente tener pronósticos de corto plazo. Este  puede ser explicada por el gran desbalance que existe entre las varianzas de los ruidos de cada ecuación del modelo, lo que se traduce en un radio señal-ruido muy alto.
+
+En efecto, en conformidad con @petrisDLM el filtro de Kalman para este simple modelo puede ser expresado de la siguiente manera:
+\[
+\begin{aligned}
+y_{1: t-1} & \sim \mathcal{N}\left(m_{t-1}, R_t=C_{t-1}+W\right) \\
+Y_t \mid y_{1: t-1} & \sim \mathcal{N}\left(f_t=m_{t-1}, Q_t=R_t+V\right) \\
+\mu_t \mid y_{1: t} & \sim \mathcal{N}\left(m_t=m_{t-1}+K_t e_t, C_t=K_t V\right)
+\end{aligned}
+\]
+
+donde la notación $y_{1: s}$ hace referencia a las observaciones $y_{1}, y_{2}, \dots, y_{s}$, $e_{t}=Y_{t}-f_{t}$ y
+
+\[
+K_{t}=\frac{R_{t}}{Q_{t}}=\frac{C_{t-1}+W}{C_{t-1}+W+V}=1-\frac{1}{\frac{C_{t-1}}{V}+\frac{W}{V}+1}.
+\]
+De la última ecuación se tiene que para valores altos de $\frac{W}{V}$, $K_{t}$ es cercano a 1. De las mismas ecuaciones que concede el filtro de Kalman se extrae la recursión
+\[
+m_{t}=K_{t}y_{t}+(1-K_{t})\,m_{t-1},
+\]
+de forma que $K_{t}$ funciona como un peso, y si $\frac{W}{V}$ es grande, entonces $m_{t}$ es "similar" a $y_{t}$ y, por lo tanto, el pronóstico a un paso se parece mucho a la última observación. En un caso extremo en que $V=0$, entonces $m_{t}=y_{t}$, es decir, el pronóstico a un paso es exactamente la observación más reciente. Es precisamente este fenómeno el que podría estar desembocando en el poco provecho del modelo en términos de sus pronósticos. 
+
+```{r, echo=FALSE}
+#| echo: false 
+
+DLMOrden1 <- function(parm) {
+      dlmModPoly(order = 1, 
+                 dV = exp(parm[1]), 
+                 dW = exp(parm[2]))
+}
+# Ajuste máxima verosimilitud
+ajusteDlmOrden1 <- dlmMLE(serie1980, rep(0, 2), build = DLMOrden1, hessian = TRUE)
+# Se aplica el filtro de Kalman:
+filtroDLM1 <-  dlmFilter(serie1980, mod = modeloDlmOrden1)
+# Se realiza el pronóstico
+forecastDLM1 <-  dlmForecast(mod = filtroDLM1, nAhead = 2)
+# forecastDLM1$f
+```
+
+```{r Pronóstico DLM orden 1}
+#| echo: false 
+
+# Se aplica el filtro de Kalman:
+
+filtroDLM1 <-  dlmFilter(serie1980, mod = modeloDlmOrden1)
+
+# Procedemos a hacer forecast, en este caso se hace se hace forecating 2 pasos adelante.
+
+forecastDLM1 <-  dlmForecast(mod = filtroDLM1, nAhead = 2)
+
+# forecastDLM1
+
+
+```
+
+En cuanto a los diagnósticos del modelo, en la @fig-diagDLM1 se observa del gráfico de residuos que hay algunos de estos muy cercanos a 2 en valor absoluto, aunque en general no se aprecia con claridad un valor extremo. Por su parte, en el ACF, la proporción de excepciones a la regla empírica es adecuada, siendo una proporción menor al 5% del total de rezagos usados (20), de modo que estos parecen no estar correlacionados. Con la prueba de Ljung-Box en la @fig-pvaluesLjBDLM1 se ve aún más sustentado que los residuos no estén correlacionados. Sin embargo, hay graves problemas con el supuesto de normalidad. En primera instancia, del histograma presente en la @fig-diagDLM1, el ajuste normal parece no ser bueno. Esto se constata con el gráfico cuantil-cuantil en la @fig-diagqqplotDLM1, donde se nota un muy mal ajuste en ambas colas. A pesar de que con pruebas como la de Shapiro-Wilk no se rechazaría la hipótesis de normalidad con niveles de significancia usuales del 1% y 5%, teniéndose un valor p de cerca del 8%, del gráfico cuantil-cuantil ya discutido no resulta fundamentada la normalidad de los residuos. 
+
+```{r}
+#| echo: false 
+# shapiro.test(residsDLM1)
+```
+
+
+```{r Diagnósticos}
+#| echo: false 
+#| fig-cap: 'Algunos diagnósticos descriptivos de los residuos para el modelo DLM polinomial de primer orden'
+#| label: fig-diagDLM1
+
+
+residsDLM1 <- residuals(filtroDLM1, sd = FALSE)
+# checkresiduals( resids, test = F)
+
+with_theme_cowplot <- function(expr) {
+  orig <- theme_get()
+  theme_set(theme_cowplot())
+  force(expr)
+  theme_set(orig)
+}
+g <- with_theme_cowplot(checkresiduals( residsDLM1, test = F, lag = 40))
+
+```
+
+
+```{r}
+#| echo: false
+# Se crea codigo para plotear los p values del estadistico Ljung-Box:
+
+
+acfLDM1 <- acf(residsDLM1, plot = F)
+
+acf_df <- data.frame(
+  acf = acfLDM1$acf,
+  lag = acfLDM1$lag
+)
+
+
+#Se calculan los p values del estadistico:
+acf_df$pvalue <- sapply(acf_df$lag, function(i) Box.test(residsDLM1, lag=i, type="Ljung-Box")$p.value)
+
+acf_df <-  acf_df[-1,] # Se elimina lag en 0.
+
+```
+
+```{r}
+#| echo: false
+#| fig-cap: ' Valores p del estadistico Ljung-Box para el modelo LDM polinomial de orden 1'
+#| label: fig-pvaluesLjBDLM1
+#| message: false
+
+graficoLjungBoxDLM1 <- ggplot(data = acf_df) +
+    geom_point(aes(lag,pvalue)) +
+    geom_hline(yintercept = 0.05, color = "red", lty= 2) 
+graficoLjungBoxDLM1 + theme_cowplot()
+
+```
+
+
+```{r}
+#| echo: false 
+#| fig-cap: 'Gráfico cuantil-cuantil de los residuos para el modelo DLM polinomial de primer orden'
+#| label: fig-diagqqplotDLM1
+#| message: false
+
+ 
+# qqnorm(resids)
+# qqline(resids)
+# shapiro.test(resids)
+
+ggqqplot(data= data.frame(residsDLM1),x="residsDLM1",
+  color = "#2C7C7E",size = 1.6,
+  shape = 1, conf.int.level = 0.95)+ 
+  labs(x = "Cuantiles teóricos",
+       y = "Cuantiles de muestra")+ 
+  theme_minimal_hgrid()
+```
+
+
+
+
+```{r}
+#| echo: false
+
+#Se crea la estructura del modelo DLM orden 2:
+DLMOrden2 <- function(parm) {
+    dlmModPoly(order = 2, dV = exp(parm[1]), dW = exp(parm[2:3]))
+           
+}
+#Se procede hacer ajuste de parametros via maxima verosimilitud:
+
+ajusteDlmOrden2 <- dlmMLE(serie, rep(0, 3), build = DLMOrden2 , hessian = TRUE)
+
+
+#Se crea el modelo con los parametros obtenidos via maxima verosimilitud:
+
+modeloDlmOrden2 <- DLMOrden2(ajusteDlmOrden2$par)
+
+
+
+```
+
+
+```{r}
+#| echo: false 
+
+#Se aplica filtro de Kalman:
+
+filtroDLM2 <-  dlmFilter(serie, mod = modeloDlmOrden2  )
+
+
+#Procedemos hacer forecast, en este caso se hace se hace forecating 2 pasos adelante.
+
+
+forecastDLM2 <-  dlmForecast(mod = filtroDLM2, nAhead = 2 )
+
+```
+
+
+```{r results='hide',fig.keep='all'}
+#| echo: false
+#| fig-cap: 'Diagnóstico de residuos para el modelo DLM polinomial de segundo orden'
+#| label: fig-diagDLM2
+#| message: false
+
+
+# Diagnostico de los residuos:
+
+resids <-  residuals(filtroDLM2, sd = FALSE)
+# Hacen varios plots para el chequeo de residuos.
+checkresiduals( resids, test = F) + theme_minimal()
+
+```
+
+De los diagnósticos de los residuos @fig-diagDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
+
+```{r}
+#| echo: false 
+#| fig-cap: 'Gráfico cuantil-cuantil de los residuos para el modelo DLM polinomial de segundo orden'
+#| label: fig-diagqqplotDLM2
+#| message: false
+ggqqplot(data= data.frame(resids),x="resids",
+  color = "#2C7C7E",size = 1,
+  shape = 1, conf.int.level = 0.95)+ 
+  labs(x = "Cuantiles teóricos",
+       y = "Cuantiles de muestra")+ 
+  theme_minimal_hgrid()
+```
+
+De la @fig-diagqqplotDLM2 se ve que el ajuste normal es bueno salvo hacia la cola izquierda.
+
+```{r}
+#| echo: false
+#Se crea codigo para plotear los p values del estadistico Ljung-Box:
+
+
+acf <- acf(resids , plot = F)
+acf_df <- data.frame(
+  acf = acf$acf,
+  lag = acf$lag
+)
+
+
+#Se calculan los p values del estadistico:
+acf_df$pvalue <- sapply(acf_df$lag, function(i) Box.test(resids, lag=i, type="Ljung-Box")$p.value)
+
+acf_df <-  acf_df[-1,] # Se elimina lag en 0.
+
+```
+
+```{r}
+#| echo: false
+#| fig-cap: ' Valores p del estadistico Ljung-Box '
+#| label: fig-pvaluesLjBDLM2
+#| message: false
+
+graficoLjungBoxDLM2 <- ggplot(data = acf_df) +
+    geom_point(aes(lag,pvalue)) +
+    geom_hline(yintercept = 0.05, color = "red", lty= 2) 
+graficoLjungBoxDLM2
+
+```
+
+El grafico @fig-pvaluesLjBDLM2 muestra los p valores para el estadistico Ljung-Box donde se observa que los valores p se encuentran por encima del umbral con valor p de 0.05 (linea punteada), indicando que los residuos del modelo DLM polinomial de orden 2 son independientes. Concluimos, que el modelo ajusta bien o que el modelo no muestra una falta de ajuste.
+
+
+
+
+
+```{r}
+#| echo: false
+
+#Se calcula el AIC, BIC y AICc 
+
+
+
+
+loglikDLM2 <- dlmLL(serie, dlmModPoly(2))
+numeroParametros <- 3
+n <- length(serie)
+AICDLM2 <- 2 * (numeroParametros) - 2*log(loglikDLM2)  
+BICDLM2 <- (log(n)) * (numeroParametros)- 2*log(loglikDLM2)
+
+AICcDLM2 <-  AICDLM2 + (2*(numeroParametros^(2) + numeroParametros))  /(n- numeroParametros-1)
+
+
+#Se aplica el test Box-Ljung:
+
+LjungTestDLM2 <-  Box.test(resids, lag = 12, type = "Ljung") 
+# Valor p del test Box-Ljung:
+valorPLjungTestDLM2 <-  LjungTestDLM2$p.value
+# estadistico del test Box-Ljung Q:
+
+estadPLjungTestDLM2 <- LjungTestDLM2$statistic
+
+
+#Se aplica el test Shapiro:
+
+ShapiTestDLM2 <-  shapiro.test(resids) 
+# Valor p del test Shapiro:
+valorPShapiTestDLM2 <-  ShapiTestDLM2$p.value
+
+# estadistico del test Shapiro W:
+
+estadShapiTestDLM2 <- ShapiTestDLM2$statistic
+
+
+
+
+```
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Resumen de diagnósticos de los modelos DLM polinomiales"
+#| label: tbl-diagDLM
+#| tbl-pos: 'h'
+
+
+modeloDLM <- c(' DLM polinomial orden 2')
+
+WDLM <-  c(estadShapiTestDLM2)
+
+SwpDLM <- c(valorPShapiTestDLM2)
+
+QDLM <- c(estadPLjungTestDLM2)
+
+ LBpDLM <- c(valorPLjungTestDLM2)
+ 
+ AICDLM <- c(AICDLM2)
+ 
+ BICDLM <- c(BICDLM2)
+
+ 
+ AICcDLM <- c(AICcDLM2)
+ 
+data.frame(modeloDLM, WDLM, SwpDLM, QDLM, LBpDLM, AICDLM, BICDLM, AICcDLM) %>%
+  kbl(
+    digits = 2,
+    col.names = c(
+      'Modelo',
+      'Estadístico W',
+      "Valor p Shapiro-Wilks",
+      "Estadístico Q",
+      "Valor p Ljung-Box",
+      "AIC",
+      "BIC",
+      "AICc"
+    ), row.names=FALSE) %>%
+  kable_styling(latex_options = c("striped"))  %>%
+  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
+                                                                     TRUE)
+```
+
+
+
+Análogamente a los modelos ARIMA , la @tbl-diagDLM muestra las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Para el caso de la prueba Shapiro-Wilks, no rechaza la hipótesis nula para el modelo DLM polinomial de orden 2, validando nuestra hipótesis de normalidad. Por otro lado, para la prueba Ljung-Box de independencia de los residuos estandarizados se da un no rechazo de la hipotesis nula, esto se observa al obtener un valor p de 0.16.
+
+Los valores del AIC, AICc y BIC  se observan que son menores a los obtenidos por los modelos ARIMA mostrados en la tabla @tbl-forARIMA indicando que el modelo DLM polinomial de orden 2 mediante estos criterios es mejor modelo que los ARIMA.
+
+
+
+
+
+```{r}
+#| echo: false
+
+#Se construyen intervalos de confianza para DLM polinomial orden 2:
+
+#Varianza:
+
+varDLM2 <-  unlist( forecastDLM2$Q)
+
+#Desviacion estandar:
+
+sdDLM2 <-  sqrt(varDLM2)
+
+#Intervalo de confianza al 95%:
+
+U95DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.05/2)
+L95DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.05/2)
+
+#Intervalo de confianza al 80%:
+
+U80DLM2 <- forecastDLM2$f + sdDLM2*qnorm(1-0.2/2)
+L80DLM2 <- forecastDLM2$f - sdDLM2*qnorm(1-0.2/2)
+
+datosICDLM2 <- data.frame(c(2019, 2020),forecastDLM2$f  ,L80DLM2, U80DLM2, L95DLM2, U95DLM2)
+
+
+```
+
+
+```{r}
+#| tbl-cap: "Intervalos de predicción del modelo DLM polinomial orden 2"
+#| label: tbl-forDlm2
+#| tbl-pos: 'h'
+#| echo: false
+datosICDLM2 %>% kbl(
+  digits = 0,
+  col.names = c('Año', 'predicción', 'Inf80', 'Sup80', 'Inf95', 'Sup95')
+) %>%
+  kable_styling(latex_options = c("striped"))  %>%
+  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
+                                                                     TRUE)
+```
+
+
+En @tbl-forDlm2 se muestran los pronósticos de defunciones realizados por el modelo para el año 2019 y 2020. Se muestran los intervalos de confianza al 80% y 95% de dichos pronósticos. Al comparar con los valores reales de 24292 para el 2019 y 26209 para el 2020 se observa que hay una diferencia de 410 y 719 defunciones aproximadamente.
+
+
+
+
+
+
+
 
 # UVE de Gowin
 
