@@ -16,6 +16,7 @@ book:
     # - Anteproyecto.qmd
     - Proyecto.qmd
     - references.qmd
+    - Anexo.qmd
 
 bibliography: references.bib
 csl: apa.csl
