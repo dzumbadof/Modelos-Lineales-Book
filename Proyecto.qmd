@@ -6,7 +6,7 @@
 	
 @REES2020239 afirma que una de las mayores contribuciones de la demografía ha sido el desarrollo de modelos para la proyección de futuras poblaciones, el cual es un tema de gran importancia para cualquier país, pues impacta directamente en sectores tan diversos como lo pueden ser la planificación urbana, el desarrollo humano sostenible, la demanda de bienes y servicios o los sistemas de pensiones. Además, esta permite estimar indicadores tan relevantes como la esperanza de vida. 
 
-Dentro de las proyecciones poblacionales se puede encontrar la proyección de la mortalidad, que está asociada directamente a las defunciones ocurridas en una población. En este trabajo se busca contestar la siguente pregunta de investigación: ¿Cómo se puede realizar un pronóstico de la serie de defunciones totales anuales de Costa Rica? Como puede notarse, la pregunta está totalmente circunsctira en el marco de la proyección poblacional. 
+Dentro de las proyecciones poblacionales se puede encontrar la proyección de la mortalidad, que está asociada directamente a las defunciones ocurridas en una población. En este trabajo se busca contestar la siguiente pregunta de investigación: ¿Cómo se puede realizar un pronóstico de la serie de defunciones totales anuales de Costa Rica? Como puede notarse, la pregunta está totalmente circunscrita en el marco de la proyección poblacional. 
 
 De forma más específica, en este trabajo se busca realizar un pronóstico de la cantidad de defunciones totales de Costa Rica para una ventana de tiempo de dos años (2019 y 2020) utilizando datos de 1950 al 2018. Para llevar a cabo este objetivo se consideran modelos ARIMA y modelos lineales generalizados, que son un caso particular de los modelos de espacio-estado. 
 
@@ -45,7 +45,7 @@ En términos generales, la demografía es "una ciencia que estudia las poblacion
 
 De acuerdo al mismo autor, hay dos grandes tipos de demografía: la estática, que "estudia las poblaciones humanas en un momento de tiempo determinado desde un punto de vista de dimensión, territorio, estructura y características estructurales" [-@bruno2019analisis] y la dinámica, "que estudia las poblaciones humanas desde el punto de vista de la evolución en el transcurso del tiempo y los mecanismos por los que se modifica la dimensión, estructura y distribución geográfica de las poblaciones" [-@bruno2019analisis]. 
 
-Bajo estas concepciones, el presente trabajo se enmarca en la demografía dinámica, pues se busca realizar pronóstico sobre una serie histórica de defunciones. El pronóstico consiste en tomar modelos ajustados a datos históricos y utilizarlos para predecir observaciones futuras. Asimismo, una serie cronológica o srie de tiempo se le llama a "la que forman los valores sucesivos que una cierta variable ha tomado en el transcurso del tiempo" [@maccio1985diccionario]. Además, según @maccio1985diccionario la mortalidad o defunción se emplea para expresar la acción de la muerte sobre la población y esta se mide en valores absolutos y sobre el año calendario.
+Bajo estas concepciones, el presente trabajo se enmarca en la demografía dinámica, pues se busca realizar pronóstico sobre una serie histórica de defunciones. El pronóstico consiste en tomar modelos ajustados a datos históricos y utilizarlos para predecir observaciones futuras. Asimismo, una serie cronológica o serie de tiempo se le llama a "la que forman los valores sucesivos que una cierta variable ha tomado en el transcurso del tiempo" [@maccio1985diccionario]. Además, según @maccio1985diccionario la mortalidad o defunción se emplea para expresar la acción de la muerte sobre la población y esta se mide en valores absolutos y sobre el año calendario.
 
 Ahora bien, las teorías demográficas "pretenden explicar los patrones del crecimiento de la población en diversos países del mundo dando cuenta de la estructura y la dinámica de la población y estableciendo leyes o principios que regirían esos fenómenos" [@bruno2019analisis]. Más específicamente, una teoría demográfica "explicaría los cambios y acontecimientos de las poblaciones humanas, de su dimensión, estructura, evolución y características generales, tanto desde un punto de vista cuantitativo (estadístico) como cualitativo (biológico, sociológico, cultural y económico)" [@bruno2019analisis].
 
@@ -62,12 +62,12 @@ Esta teoría establece que los principales factores causantes de las transicione
 
 Es importante mencionar que tal como lo establece @mariscal2018tres la TTE, tiene como objeto de estudio la mortalidad, ya que se centra en aspectos como: patrones de enfermedad, causas de las muertes y la interacción de estas con patrones demográficos, económicos y sociológicos.
 
-Como antecedentes, se observa que en múltiples investigaciones con temáticas relacionadas a defunciones como el de  @adekambi  y el estudio por @ordorika, se implementan modelos para el pronóstico de series defunciones mediante distintos enfoques, entre ellos pronóstico mediante el empleo de modelos ARIMA, sin embargo estudios más recientes hacen uso de los Modelos Dinámicos Lineales.
+Como antecedentes, se observa que en múltiples investigaciones con temáticas relacionadas con defunciones como el de  @adekambi  y el estudio por @ordorika, se implementan modelos para el pronóstico de series defunciones mediante distintos enfoques, entre ellos pronóstico mediante el empleo de modelos ARIMA,sin embargo estudios más recientes hacen uso de los Modelos Dinámicos Lineales.
 
 
 Se propone un modelo DLM de primer orden ya que como establece @optimalDLM los DLM de primer orden son algoritmos recomendados al lidiar con datos anuales debido a que las series de tiempo es corta y no presentan patrones estacionales.Dado que nuestros datos son anuales, este modelo se presenta como un posible candidato.
 
-Por su parte @optimalDLM, señala que los DLM de segundo orden son útiles para describir tendencias. Dada la tendencia observada de la serie de defunciones totales sugiere por tanto realizar un modelo  polinomial de segundo orden.
+Por su parte @optimalDLM, señala que los DLM de segundo orden son útiles para describir tendencias. Dada la tendencia observada de la serie de defunciones totales, sugiere,por tanto, realizar un modelo  polinomial de segundo orden.
 
 
 Tal como lo establece  @petrisDLM entre los modelos más utilizados para el análisis de series temporales se encuentra la clase de modelos de media móvil autorregresiva (ARMA). Para enteros, no negativos $p$ y $q$, un modelo ARMA$(p,q)$ es definido mediante la notación:
@@ -123,11 +123,10 @@ Y_t &=\theta_{t,1} + v_t, & v_t \sim \mathcal{N}(0, V) \\
 
 ## Descripción de los datos
 
-La tabla de datos proviene del Instituto Nacional de Estadística y Censos (INEC) de Costa Rica y es de acceso público, descargable desde la página web del instituto, como puede consultarse en @INEC_base. Esta base presenta los principales indicadores demográficos anuales de Costa Rica durante el periodo 1950-2020. Incluye en total 18 variables, entre las cuales están el año, la población total al 30 de junio de cada año, desagregado también por sexo, así como la cantidad de defunciones. Las variables presentes en la tabla son las siguientes: **Población de estudio:**La población de estudio son aquellas personas que vivían en Costa Rica entre los años 1950-2020 y mueren en este periodo. **Muestra observada:** La muestra observada, son todas aquellas personas que vivían en Costa Rica y al morir son  registrados por el Instituto Nacional de Estadística y Censo. **Unidad estadística o individuos**: La unidad estadística es el recuento anual de defunciones en Costa Rica. **Variables de estudio:** Son un total de 18 variables, las cuales según @INEC_conceptos se tiene: **Año:** Esta variable indica el año. **Total:** Esta variable registra la población total. **Hombres:** Esta variable registra la población total de hombres. **Mujeres:** Esta variable se encarga de registar el total de mujeres. **Nacimientos:** Esta variable registra el total de nacimientos. **Defunciones:** Esta variable registra el total de defunciones. **Defunciones infantiles:** Esta variable registra las defunciones de infantes (niños y niñas). **Defunciones neonatales:** Esta variable registra las defunciones de recién nacidos, hace referencia a la mortalidad de los nacidos antes de alcanzar los 28 días de edad. **Defunciones fetales:** Esta variable registra las defunciones de fetos, se refiere a la mortalidad de un bebé antes o durante el parto. **Tasa de crecimiento:** Esta variable registra la tasa de crecimiento de la población costarricense.Se refiere al crecimiento de la población entre dos fechas sin contemplar la migración.
+La tabla de datos proviene del Instituto Nacional de Estadística y Censos (INEC) de Costa Rica y es de acceso público, descargable desde la página web del instituto, como puede consultarse en @INEC_base. Esta base presenta los principales indicadores demográficos anuales de Costa Rica durante el periodo 1950-2020. Incluye en total 18 variables, entre las cuales están el año, la población total al 30 de junio de cada año, desagregado también por sexo, así como la cantidad de defunciones. Las variables presentes en la tabla son las siguientes: **Población de estudio:**La población de estudio son aquellas personas que vivían en Costa Rica entre los años 1950-2020 y mueren en este periodo. **Muestra observada:** La muestra observada, son todas aquellas personas que vivían en Costa Rica y al morir son  registrados por el Instituto Nacional de Estadística y Censo. **Unidad estadística o individuos**: La unidad estadística es el recuento anual de defunciones en Costa Rica. **Variables de estudio:** Son un total de 18 variables, las cuales según @INEC_conceptos se tiene: **Año:** Esta variable indica el año. **Total:** Esta variable registra la población total. **Hombres:** Esta variable registra la población total de hombres. **Mujeres:** Esta variable se encarga de registrar el total de mujeres. **Nacimientos:** Esta variable registra el total de nacimientos. **Defunciones:** Esta variable registra el total de defunciones. **Defunciones infantiles:** Esta variable registra las defunciones de infantes (niños y niñas). **Defunciones neonatales:** Esta variable registra las defunciones de recién nacidos, hace referencia a la mortalidad de los nacidos antes de alcanzar los 28 días de edad. **Defunciones fetales:** Esta variable registra las defunciones de fetos, se refiere a la mortalidad de un bebé antes o durante el parto. **Tasa de crecimiento:** Esta variable registra la tasa de crecimiento de la población costarricense.Se refiere al crecimiento de la población entre dos fechas sin contemplar la migración.
 **Tasa de natalidad:** Esta variable registra la tasa de nacimientos registrados en la población costarricenses. **Tasa de mortalidad:** Esta variable registra la tasa de muertes en su totalidad.
 **Tasa de mortalidad infantil** Esta variable registra la tasa de muertes infantiles **Tasa de mortalidad neonatal:** Esta variable registra la tasa de muertes neonatales. **Tasa de mortalidad fetal:** En esta variable se registra la tasa de muertes fetales. **Tasa global de fecundidad:** Esta variable registra la tasa de fecundidad global (TGF), la cual indica cantidad de hijos e hijas que en promedio tendría cada mujer al final del periodo fértil, si durante su vida tiene sus hijos e hijas de acuerdo a las tasas de fecundidad por edad observadas en el país y año de interés y, además estas mujeres no están afectadas por la mortalidad desde el nacimiento hasta el final de periodo fértil.
-**Tasa bruta de reproducción:** Esta variable hace referencia a el cantidad de hijas que en promedio
-tendría cada mujer al final del periodo fértil, si durante su vida tiene sus hijos e hijas de acuerdo a las tasas de fecundidad por edad observadas en el país y año de interés y, además estas mujeres no están afectadas por la mortalidad desde el nacimiento hasta el final de periodo fértil. **Tasa neta de reproducción:** es el número de hijas que en promedio tendría cada mujer al final del periodo fértil, si durante su vida tiene sus hijos e hijas de acuerdo a las tasas de fecundidad por edad observadas en el país y año de interés y, además estas mujeres sí están afectadas por la mortalidad por edad observada en el país y año de interés desde el nacimiento hasta el final de periodo fértil.
+**Tasa bruta de reproducción:** Esta variable hace referencia la cantidad de hijas que en promedio tendría cada mujer al final del periodo fértil, si durante su vida tiene sus hijos e hijas de acuerdo a las tasas de fecundidad por edad observadas en el país y año de interés y, además, estas mujeres no están afectadas por la mortalidad desde el nacimiento hasta el final de periodo fértil. **Tasa neta de reproducción:** es el número de hijas que en promedio tendría cada mujer al final del periodo fértil, si durante su vida tiene sus hijos e hijas de acuerdo a las tasas de fecundidad por edad observadas en el país y año de interés y, además estas mujeres sí están afectadas por la mortalidad por edad observada en el país y año de interés desde el nacimiento hasta el final de periodo fértil.
 
 ## Análisis descriptivo de los datos
 
@@ -182,7 +181,7 @@ tabla <- resumen %>%
 tabla
 ```
 
-En la tabla @tbl-estadisticos_dispersion se detallan los estadísticos de desviación estándar y rango intercuartílico para algunas variables relevante de la tabla de datos. Se observa que la variable población de hombres presenta mayor dispersión respecto población de mujeres, esta mayor variabilidad en la población de hombres se puede deber a diversos factores, entre ellos : una diferencia en el número de defunciones, nacimientos, o número de migrantes en la población masculina en relación con la de población femenina.
+En la tabla @tbl-estadisticos_dispersion se detallan los estadísticos de desviación estándar y rango intercuartílico para algunas variables relevantes de la tabla de datos. Se observa que la variable población de hombres presenta mayor dispersión respecto población de mujeres, esta mayor variabilidad en la población de hombres se puede deber a diversos factores, entre ellos : una diferencia en el número de defunciones, nacimientos, o número de migrantes en la población masculina en relación con la de población femenina.
 
 ```{r, echo=F}
 #| tbl-cap: "Estadísticos de dispersión para algunas variables de la tabla de datos"
@@ -210,7 +209,7 @@ tabla <- resumen %>%
 tabla
 ```
 
-Una observación importante, es que los nacimientos presentan una mayor dispersión respecto a el número de defunciones. Es decir, se observa que el número defunciones anuales presenta menor desviación respecto a la media (desviación estándar) y una menor diferencia entre tercer cuartil y primer cuartil de defunciones (IQR).
+Una observación importante, es que los nacimientos presentan una mayor dispersión respecto al número de defunciones. Es decir, se observa que el número defunciones anuales presenta menor desviación respecto a la media (desviación estándar) y una menor diferencia entre tercer cuartil y primer cuartil de defunciones (IQR).
 
 Análogamente, se observa que para los tipos de defunción: infantil, neonatales y fetales. Se evidencia una mayor dispersión para las defunciones infantiles, seguidas de las neonatales y por último, con menor dispersión las defunciones fetales. 
 
@@ -274,7 +273,7 @@ g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
 
 g
 ```
-En la @fig-defunciones_ano se muestra la cantidad total de defunciones para el periodo 1950-2020. Destaca una tendencia creciente muy marcada a partir de cerca de 1980 y hasta el final del periodo considerado. Esto muestra que se debe hacer una transformación a los datos para lograr la estacionareidad que supone el modelo ARMA. También se resalta que para el 2020 las defunciones totales se encuentran claramente por arriba de la tendencia lo cual se debe probablemente a la pandemia del Covid-19.
+En la @fig-defunciones_ano se muestra la cantidad total de defunciones para el periodo 1950-2020. Destaca una tendencia creciente muy marcada a partir de cerca de 1980 y hasta el final del periodo considerado. Esto muestra que se debe hacer una transformación a los datos para lograr la estacionariedad que supone el modelo ARMA. También se resalta que para el 2020 las defunciones totales se encuentran claramente por arriba de la tendencia lo cual se debe probablemente a la pandemia del Covid-19.
 
 En la @fig-def_inf_neonat_fet_ano se comparan las defunciones infantiles, neonatales y fetales. Cabe añadir que la distancia vertical entre las defunciones infantiles y las neonatales resulta en las llamadas defunciones posneonatales, es decir, las que ocurren a partir de los 29 días de edad y hasta un año. Se advierte que a mediados de los años sesenta la cantidad de defunciones infantiles aparenta tener una tendencia decreciente. Al respecto, Rosero Bixby afirma que la caída más dramática en los años setenta "se logra gracias a los programas de atención primaria
 de la salud, ayudados por una extraordinaria reducción de la natalidad que permite un mejor desarrollo intrauterino, mejor cuidado del niño y reduce el riesgo de contagio" [-@rosero2004situacion]. El mismo autor menciona que "el riesgo de morir de los menores de un
@@ -322,7 +321,7 @@ serie <- ts( entrenamiento, start=c(1980,1), frequency=1)
 fit1 <- lm(serie ~ time(serie))
 ```
 
-De la @fig-acfRegresion del anexo se observa que los residuos lucen estacionarios. Además, parece que el PACF se trunca después del primer rezago, mientras que el ACF decrece. Esto sugiere fuertemente un modelo autoregresivo AR(1). Tambiés es posible que se trunque el ACF luego del primer o segundo rezago, mientras que el ACF decrece, por lo que también se tienen los modelos candidatos MA(1) Y MA(2)
+De la @fig-acfRegresion del anexo se observa que los residuos lucen estacionarios. Además, parece que el PACF se trunca después del primer rezago, mientras que el ACF decrece. Esto sugiere fuertemente un modelo autoregresivo AR(1). También es posible que se trunque el ACF luego del primer o segundo rezago, mientras que el ACF decrece, por lo que también se tienen los modelos candidatos MA(1) Y MA(2)
 
 ```{r results='hide', fig.keep='all'}
 #| echo: false
@@ -421,7 +420,7 @@ data.frame(Componente, W, SWp, Q, LBp, AIC, BIC, AICc) %>%
                                                                      TRUE)
 ```
 
-La @tbl-diagARIMA resume las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Se da un no rechazo de las hipótesis nulas de independencia y normalidad de los residuos en el primer y tercer modelo. Además, se da un rechazo de la hipótesis de normalidad e independencia de los residuos en el segundo modelo. Para una desglose visual de los diagnósticos de los modelos SARIMA ajustadas se puede consultar el anexo. El modelo autoregresivo presenta las mejores medidas de AIC, AICc y BIC, aparte de ser el más parsimonioso de los tres. Por esta razón se decide escoger el modelo con componente ARMA(1,0) para hacer el pronóstico.
+La @tbl-diagARIMA resume las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Se da un no rechazo de las hipótesis nulas de independencia y normalidad de los residuos en el primer y tercer modelo. Además, se da un rechazo de la hipótesis de normalidad e independencia de los residuos en el segundo modelo. Para un desglose visual de los diagnósticos de los modelos SARIMA ajustadas se puede consultar el anexo. El modelo autoregresivo presenta las mejores medidas de AIC, AICc y BIC, aparte de ser el más parsimonioso de los tres. Por esta razón se decide escoger el modelo con componente ARMA(1,0) para hacer el pronóstico.
 
 ```{r}
 #| fig-cap: 'Pronóstico del modelo con componente ARMA(1,0) de las defunciones totales'
@@ -469,7 +468,7 @@ abs( as.numeric(def.for$pred) - base$defunciones[70:71])
 
 ### DLM 1
 
-Para utilizar un DLM polinomial de orden 1, se empieza por estimar los parámetros $V$ y $W$ correspondientes a la varianza de el ruido blanco gaussiano aditivo en las ecuaciones observada y del sistema, respectivamente. Esto se lleva a cabo por máxima verosimilitud, y se obtiene $\hat{V}=0.37$ y $\hat{W}=304117$. Nótese la gran diferencia en escala entre ambas varianzas. En @petrisDLM se advierte que este modelo en particular es muy sensible respecto al valor de la razón $\frac{W}{V}$, llamada *radio señal-ruido*. Cabe mencionar también que este proceso se comporta asintóticamente como un ARIMA(0,1,1) [@petrisDLM].
+Para utilizar un DLM polinomial de orden 1, se empieza por estimar los parámetros $V$ y $W$ correspondientes a la varianza del ruido blanco gaussiano aditivo en las ecuaciones observada y del sistema, respectivamente. Esto se lleva a cabo por máxima verosimilitud, y se obtiene $\hat{V}=0.37$ y $\hat{W}=304117$. Nótese la gran diferencia en escala entre ambas varianzas. En @petrisDLM se advierte que este modelo en particular es muy sensible respecto al valor de la razón $\frac{W}{V}$, llamada *radio señal-ruido*. Cabe mencionar también que este proceso se comporta asintóticamente como un ARIMA(0,1,1) [@petrisDLM].
 
 
 ```{r Estimación DLM orden 1, echo=FALSE}
@@ -561,7 +560,7 @@ checkresiduals( resids, test = F) + theme_minimal()
 
 ```
 
-De los diagnósticos de los residuos @fig-diagDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la hipotesis de normalidad.
+De los diagnósticos de los residuos @fig-diagDLM2 se osberva del grafico de ACF que existe una baja correlación entre los residuos lo cual se confirma al aplicar la prueba  Ljung-Box. Se observa del gráfico superior de residuos la presencia de outliers, esto se ve reflejado el en el histograma de los residuos en la parte inferior derecha donde se ve que los residuos presentan colas de mayor peso que la distribución normal, no obstante al aplicar la prueba  Shapiro-Wilks de normalidad se observa que no se rechaza la  hipótesis de normalidad.
 
 ```{r}
 #| echo: false 
@@ -715,7 +714,7 @@ QDLM <- c(estadPLjungTestDLM2)
 
 
 
-Análogamente a los modelos ARIMA , la @tbl-diagDLM muestra las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Para el caso de la prueba Shapiro-Wilks, no rechaza la hipótesis nula para el modelo DLM polinomial de orden 2, validando nuestra hipótesis de normalidad. Por otro lado, para la prueba Ljung-Box de independencia de los residuos estandarizados se da un no rechazo de la hipotesis nula, esto se observa al obtener un valor p de 0.16.
+Análogamente a los modelos ARIMA , la @tbl-diagDLM muestra las pruebas Shapiro-Wilks de normalidad y Ljung-Box de independencia de los residuos estandarizados. Para el caso de la prueba Shapiro-Wilks, no rechaza la hipótesis nula para el modelo DLM polinomial de orden 2, validando nuestra hipótesis de normalidad. Por otro lado, para la prueba Ljung-Box de independencia de los residuos estandarizados se da un no rechazo de la hipótesis nula, esto se observa al obtener un valor p de 0.16.
 
 Los valores del AIC, AICc y BIC  se observan que son menores a los obtenidos por los modelos ARIMA mostrados en la tabla @tbl-forARIMA indicando que el modelo DLM polinomial de orden 2 mediante estos criterios es mejor modelo que los ARIMA.
 
@@ -777,7 +776,7 @@ Ambos modelos estudiados logran hacer pronósticos a dos años de las defuncione
 
 Si bien el modelo DLM polinomial de orden no logra ser tan preciso como el ARIMA para el año 2019, sí logra ser más preciso para el año 2020, mostrando un mejor ajuste para lo que se consideraría un año extraordinario por ser el primer año de pandemia.  
 
-Los pronósticos hechos por el modelo DLM polinimal de orden 1 no resultan útiles producto de la razón señal-ruido tan alta, Sin embargo, este resultado es consistente con el modelo. 
+Los pronósticos hechos por el modelo DLM polinomiales de orden 1 no resultan útiles producto de la razón señal-ruido tan alta, Sin embargo, este resultado es consistente con el modelo. 
 
 
 ## Limitaciones 
