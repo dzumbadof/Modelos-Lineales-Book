@@ -5,17 +5,14 @@
 	
 @REES2020239 afirma que una de las mayores contribuciones de la demografía ha sido el desarrollo de modelos para la proyección de futuras poblaciones, el cual es un tema de gran importancia para cualquier país, pues impacta directamente en sectores tan diversos como lo pueden ser la planificación urbana, el desarrollo humano sostenible, la demanda de bienes y servicios o los sistemas de pensiones. Además, esta permite estimar indicadores tan relevantes como la esperanza de vida. 
 
-Se puede definir la proyección poblacional como el "cálculo de los cambios futuros en el número de personas, sujeto a ciertas hipótesis acerca de las tendencias futuras en las tasas de la fecundidad, mortalidad y migración" [@CCPconcepts].
-
 Dentro de las proyecciones poblacionales se puede encontrar la proyección de la mortalidad, que está asociada directamente a las defunciones ocurridas en una población. En este trabajo se busca contestar la siguente pregunta de investigación: ¿Cómo se puede realizar un pronóstico de la serie de defunciones totales anuales de Costa Rica? Como puede notarse, la pregunta está totalmente circunsctira en el marco de la proyección poblacional. 
 
 De forma más específica, en este trabajo se busca realizar un pronóstico de la cantidad de defunciones totales de Costa Rica para una ventana de tiempo de dos años (2019 y 2020) utilizando datos de 1950 al 2018. Para llevar a cabo este objetivo se consideran modelos ARIMA y modelos lineales generalizados, que son un caso particular de los modelos de espacio-estado. 
 
 
-
-
 ```{r, R.options, echo=F, include=F, warning=F, message=F}
-options(knitr.kable.NA = '-', echo = F, scipen = 999)
+options(knitr.kable.NA = '-', scipen = 999)
+knitr::opts_chunk$set( echo = FALSE, fig.width = 6, message = FALSE, warning = FALSE)
 library(readxl)
 library(kableExtra)
 library(dplyr)
@@ -47,12 +44,7 @@ En términos generales, la demografía es "una ciencia que estudia las poblacion
 
 De acuerdo al mismo autor, hay dos grandes tipos de demografía: la estática, que "estudia las poblaciones humanas en un momento de tiempo determinado desde un punto de vista de dimensión, territorio, estructura y características estructurales" [-@bruno2019analisis] y la dinámica, "que estudia las poblaciones humanas desde el punto de vista de la evolución en el transcurso del tiempo y los mecanismos por los que se modifica la dimensión, estructura y distribución geográfica de las poblaciones" [-@bruno2019analisis]. 
 
-Bajo estas concepciones, el presente trabajo caería en el campo de la demografía dinámica, pues se buscará realizar pronóstico sobre la serie histórica de defunciones de Costa Rica de 1950 a 2020. En ese sentido, @REES2020239 afirma que una de las mayores contribuciones de la demografía ha sido el desarrollo de modelos para la proyección de futuras poblaciones, lo cuál está estrechamente relacionado con la proyección de defunciones.
-
-Según @maccio1985diccionario la mortalidad o defunción se emplea para expresar la acción de la muerte sobre la población y esta se mide en valores absolutos y sobre el año calendario. Por su parte y de acuerdo a @brownlee, la realización de predicciones sobre el futuro se denomina extrapolación en el tratamiento estadístico clásico de los datos de las series temporales.
-
-Los campos más modernos que se centran en el tema, lo denominan pronóstico de series temporales. El pronóstico consiste en tomar modelos ajustados a datos históricos y utilizarlos para predecir observaciones futuras. Asimismo, una serie cronológica o crónica se le llama a "la que forman los valores sucesivos que una cierta variable ha tomado en el transcurso del tiempo" [@maccio1985diccionario], como lo puede ser, por ejemplo, la serie de defunciones totales anuales para un país en específico.
-
+Bajo estas concepciones, el presente trabajo se enmarca en la demografía dinámica, pues se busca realizar pronóstico sobre una serie histórica de defunciones. El pronóstico consiste en tomar modelos ajustados a datos históricos y utilizarlos para predecir observaciones futuras. Asimismo, una serie cronológica o srie de tiempo se le llama a "la que forman los valores sucesivos que una cierta variable ha tomado en el transcurso del tiempo" [@maccio1985diccionario]. Además, según @maccio1985diccionario la mortalidad o defunción se emplea para expresar la acción de la muerte sobre la población y esta se mide en valores absolutos y sobre el año calendario.
 
 Ahora bien, las teorías demográficas "pretenden explicar los patrones del crecimiento de la población en diversos países del mundo dando cuenta de la estructura y la dinámica de la población y estableciendo leyes o principios que regirían esos fenómenos" [@bruno2019analisis]. Más específicamente, una teoría demográfica "explicaría los cambios y acontecimientos de las poblaciones humanas, de su dimensión, estructura, evolución y características generales, tanto desde un punto de vista cuantitativo (estadístico) como cualitativo (biológico, sociológico, cultural y económico)" [@bruno2019analisis].
 
@@ -68,7 +60,6 @@ La Teoría de la transición epidemiológica (TTE) surge como alternativa teóri
 Esta teoría establece que los principales factores causantes de las transiciones demográficas son los factores ecobiológicos de la mortalidad, factores biopsicológicos, como el uso de contraconceptivos ante el aumento de la supervivencia infantil generando un aumento de la EV, factores médicos y de salud pública, factores psicológicos o emocionales, y factores socioeconómicos, ya que los desarrollos económicos establecen los primeros sistemas sanitarios, ayudando así al descenso de la mortalidad y la reducción de la incidencia de las enfermedades infecciosas.
 
 Es importante mencionar que tal como lo establece @mariscal2018tres la TTE, tiene como objeto de estudio la mortalidad, ya que se centra en aspectos como: patrones de enfermedad, causas de las muertes y la interacción de estas con patrones demográficos, económicos y sociológicos.
-
 
 Como antecedentes, se observa que en múltiples investigaciones con temáticas relacionadas a defunciones como el de  @adekambi  y el estudio por @ordorika, se implementan modelos para el pronóstico de series defunciones mediante distintos enfoques, entre ellos pronóstico mediante el empleo de modelos ARIMA, sin embargo estudios más recientes hacen uso de los Modelos Dinámicos Lineales. 
 
@@ -96,16 +87,9 @@ $$\theta_{t} | \mathcal{D}_{t} \sim \mathcal{N}(m_{t}, C_{t}) , t \geq 1$$
 
 Se tiene que:
 
-La densidad de predicción de estado de $k$-pasos con  $k \geq 1$ hacia adelante de $\theta_{t+k}$ dada  la información pasada $D_{t}$ es Gaussiana  con media y varianza condicional dadas respectivamente por:
+La densidad de predicción de estado de $k$-pasos con  $k \geq 1$ hacia adelante de $\theta_{t+k}$ dada  la información pasada $D_{t}$ es Gaussiana  con media y varianza condicional dadas respectivamente por $a_{t}(k) = {E}[\theta_{t+k}|D_{t} ] = G_{t+k}a_{t, k-1}$ y $R_{t}(k)= {Var}[\theta_{t+k}|D_{t} ] =G_{t+k}R_{t,k-1}G^{'}_{t+k} + W_{t+k}$.
 
-$$a_{t}(k) = {E}[\theta_{t+k}|D_{t} ] = G_{t+k}a_{t, k-1}$$
-$$R_{t}(k)= {Var}[\theta_{t+k}|D_{t} ] =G_{t+k}R_{t,k-1}G^{'}_{t+k} + W_{t+k}$$
-
-La densidad de predicción de $k$-pasos con  $k \geq 1$ hacia adelante de $Y_{t+k}$ dada  la información pasada $D_{t}$, es Gaussiana  con media y varianza condicional dadas respectivamente por:
-
-$$f_{t}(k) = {E}[Y_{t+k}|D_{t} ] =F_{t+k}a_{t}(k)$$
-
-$$Q_{t}(k)= {Var}[Y_{t+k}|D_{t} ]  =F_{t+k}R_{t}(k)F^{'}_{t+k} + V_{t+k}$$
+La densidad de predicción de $k$-pasos con  $k \geq 1$ hacia adelante de $Y_{t+k}$ dada  la información pasada $D_{t}$, es Gaussiana  con media y varianza condicional dadas respectivamente por $f_{t}(k) = {E}[Y_{t+k}|D_{t} ] =F_{t+k}a_{t}(k)$ y $Q_{t}(k)= {Var}[Y_{t+k}|D_{t} ]  =F_{t+k}R_{t}(k)F^{'}_{t+k} + V_{t+k}$.
 
 El DLM polinomial de orden 1 es descrito por el par de ecuaciones:
 \[
@@ -116,7 +100,6 @@ Y_t &=\mu_t+v_t, & v_t \sim \mathcal{N}(0, V) \\
 \]
 
 donde $(Y_{t})$ es, para efectos del presente análisis, el proceso del total de defunciones anuales de Costa Rica. 
-
 
 Por otro lado, el modelo DLM polinomial de orden 2 se describe mediante las siguientes ecuaciones:
 
@@ -312,34 +295,6 @@ g <- g + theme(axis.text.x = element_text(angle = 45,vjust = 0.5, hjust=0.5))
 g <- g + scale_color_brewer(palette = "PuBuGn")
 g
 ```
-
-Para estudiar la asociación entre la tasa de defunciones neonatales y la de defunciones fetales, se crea una variable categórica indicadora de si la primera es mayor a la segunda. Dado que ambas tasas se calculan respecto al mismo denominador (la cantidad de nacimientos), esta variable equivale a hacer los mismo con la cantidad de defunciones respectiva. En la @fig-indicadora_neonat_fet se muestra la distribución de esta variable y se ve que en 15 de los 71 años considerados la tasa de mortalidad fetal fue mayor, donde de la @fig-def_inf_neonat_fet_ano se sabe que esto sucedió mayoritariamente entre 1985 y 2020. En consecuencia, en 56 años fue mayor la tasa de mortalidad neonatal, lo cuál sucede sobre todo en los primeros 35 años a partir de 1950. Entonces, en los 71 años de estudio, 78.87% de las ocasiones fue mayor la tasa de mortalidad neonatal, contra un 21.13% de la fetal.
-
-```{r, echo=FALSE}
-#| fig-cap: "Distribución variable indicadora de la mayor tasa entre las de mortalidad fetal y la neonatal"
-#| label: fig-indicadora_neonat_fet
-#| fig-cap-location: top
-
-# Se crea variable que indica si la tasa de mortalidad neonatal es mayor a la fetal
-datos <- base %>% mutate(indicadora = as.factor(tasa_de_mortalidad_neonatal>tasa_de_mortalidad_fetal))
-
-g <- ggplot(datos) +
-geom_bar(aes(indicadora, fill = indicadora), show.legend = FALSE)
-
-g <- g + scale_x_discrete(labels = c("Fetal", "Neonatal"))
-g <- g + scale_y_continuous(breaks = seq(0,60,5), limits = c(0,60))
-
-g <- g + labs(x = "Tasa de mortalidad mayor",
-              y = "Conteo",
-              caption = "Fuente: Elaboración propia con datos del INEC",
-              color="Tipo de tasa")
-g <- g + theme_cowplot() 
-g <- g + scale_fill_brewer(palette = "PuBuGn")
-g
-
-```
-
-
 
 ## Métodos y resultados
 
@@ -541,140 +496,8 @@ modeloDlmOrden1 <- DLMOrden1(ajusteDlmOrden1$par)
 
 Una vez obtenidos estos parámetros, se procede a aplicar el filtro de Kalman y con este se realiza el pronóstico de la cantidad total de defunciones para 2019 y 2020, donde se encuentra un inconveniente: para ambos años, el pronóstico es de 23786 defunciones. Más aún, esta cantidad es justamente el total de defunciones en  2018. Sin duda esto representa una gran desventaja de este modelo pues claramente no resulta útil en términos de predicción, incluso teniendo en cuenta que solo es prudente tener pronósticos de corto plazo. Este  puede ser explicada por el gran desbalance que existe entre las varianzas de los ruidos de cada ecuación del modelo, lo que se traduce en un radio señal-ruido muy alto.
 
-En efecto, en conformidad con @petrisDLM el filtro de Kalman para este simple modelo puede ser expresado de la siguiente manera:
-\[
-\begin{aligned}
-y_{1: t-1} & \sim \mathcal{N}\left(m_{t-1}, R_t=C_{t-1}+W\right) \\
-Y_t \mid y_{1: t-1} & \sim \mathcal{N}\left(f_t=m_{t-1}, Q_t=R_t+V\right) \\
-\mu_t \mid y_{1: t} & \sim \mathcal{N}\left(m_t=m_{t-1}+K_t e_t, C_t=K_t V\right)
-\end{aligned}
-\]
-
-donde la notación $y_{1: s}$ hace referencia a las observaciones $y_{1}, y_{2}, \dots, y_{s}$, $e_{t}=Y_{t}-f_{t}$ y
-
-\[
-K_{t}=\frac{R_{t}}{Q_{t}}=\frac{C_{t-1}+W}{C_{t-1}+W+V}=1-\frac{1}{\frac{C_{t-1}}{V}+\frac{W}{V}+1}.
-\]
-De la última ecuación se tiene que para valores altos de $\frac{W}{V}$, $K_{t}$ es cercano a 1. De las mismas ecuaciones que concede el filtro de Kalman se extrae la recursión
-\[
-m_{t}=K_{t}y_{t}+(1-K_{t})\,m_{t-1},
-\]
-de forma que $K_{t}$ funciona como un peso, y si $\frac{W}{V}$ es grande, entonces $m_{t}$ es "similar" a $y_{t}$ y, por lo tanto, el pronóstico a un paso se parece mucho a la última observación. En un caso extremo en que $V=0$, entonces $m_{t}=y_{t}$, es decir, el pronóstico a un paso es exactamente la observación más reciente. Es precisamente este fenómeno el que podría estar desembocando en el poco provecho del modelo en términos de sus pronósticos. 
-
-```{r, echo=FALSE}
-#| echo: false 
-
-DLMOrden1 <- function(parm) {
-      dlmModPoly(order = 1, 
-                 dV = exp(parm[1]), 
-                 dW = exp(parm[2]))
-}
-# Ajuste máxima verosimilitud
-ajusteDlmOrden1 <- dlmMLE(serie1980, rep(0, 2), build = DLMOrden1, hessian = TRUE)
-# Se aplica el filtro de Kalman:
-filtroDLM1 <-  dlmFilter(serie1980, mod = modeloDlmOrden1)
-# Se realiza el pronóstico
-forecastDLM1 <-  dlmForecast(mod = filtroDLM1, nAhead = 2)
-# forecastDLM1$f
-```
-
-```{r Pronóstico DLM orden 1}
-#| echo: false 
-
-# Se aplica el filtro de Kalman:
-
-filtroDLM1 <-  dlmFilter(serie1980, mod = modeloDlmOrden1)
-
-# Procedemos a hacer forecast, en este caso se hace se hace forecating 2 pasos adelante.
-
-forecastDLM1 <-  dlmForecast(mod = filtroDLM1, nAhead = 2)
-
-# forecastDLM1
-
-
-```
-
-En cuanto a los diagnósticos del modelo, en la @fig-diagDLM1 se observa del gráfico de residuos que hay algunos de estos muy cercanos a 2 en valor absoluto, aunque en general no se aprecia con claridad un valor extremo. Por su parte, en el ACF, la proporción de excepciones a la regla empírica es adecuada, siendo una proporción menor al 5% del total de rezagos usados (20), de modo que estos parecen no estar correlacionados. Con la prueba de Ljung-Box en la @fig-pvaluesLjBDLM1 se ve aún más sustentado que los residuos no estén correlacionados. Sin embargo, hay graves problemas con el supuesto de normalidad. En primera instancia, del histograma presente en la @fig-diagDLM1, el ajuste normal parece no ser bueno. Esto se constata con el gráfico cuantil-cuantil en la @fig-diagqqplotDLM1, donde se nota un muy mal ajuste en ambas colas. A pesar de que con pruebas como la de Shapiro-Wilk no se rechazaría la hipótesis de normalidad con niveles de significancia usuales del 1% y 5%, teniéndose un valor p de cerca del 8%, del gráfico cuantil-cuantil ya discutido no resulta fundamentada la normalidad de los residuos. 
-
-```{r}
-#| echo: false 
-# shapiro.test(residsDLM1)
-```
-
-
-```{r Diagnósticos}
-#| echo: false 
-#| fig-cap: 'Algunos diagnósticos descriptivos de los residuos para el modelo DLM polinomial de primer orden'
-#| label: fig-diagDLM1
-
-
-residsDLM1 <- residuals(filtroDLM1, sd = FALSE)
-# checkresiduals( resids, test = F)
-
-with_theme_cowplot <- function(expr) {
-  orig <- theme_get()
-  theme_set(theme_cowplot())
-  force(expr)
-  theme_set(orig)
-}
-g <- with_theme_cowplot(checkresiduals( residsDLM1, test = F, lag = 40))
-
-```
-
-
-```{r}
-#| echo: false
-# Se crea codigo para plotear los p values del estadistico Ljung-Box:
-
-
-acfLDM1 <- acf(residsDLM1, plot = F)
-
-acf_df <- data.frame(
-  acf = acfLDM1$acf,
-  lag = acfLDM1$lag
-)
-
-
-#Se calculan los p values del estadistico:
-acf_df$pvalue <- sapply(acf_df$lag, function(i) Box.test(residsDLM1, lag=i, type="Ljung-Box")$p.value)
-
-acf_df <-  acf_df[-1,] # Se elimina lag en 0.
-
-```
-
-```{r}
-#| echo: false
-#| fig-cap: ' Valores p del estadistico Ljung-Box para el modelo LDM polinomial de orden 1'
-#| label: fig-pvaluesLjBDLM1
-#| message: false
-
-graficoLjungBoxDLM1 <- ggplot(data = acf_df) +
-    geom_point(aes(lag,pvalue)) +
-    geom_hline(yintercept = 0.05, color = "red", lty= 2) 
-graficoLjungBoxDLM1 + theme_cowplot()
-
-```
-
-
-```{r}
-#| echo: false 
-#| fig-cap: 'Gráfico cuantil-cuantil de los residuos para el modelo DLM polinomial de primer orden'
-#| label: fig-diagqqplotDLM1
-#| message: false
-
- 
-# qqnorm(resids)
-# qqline(resids)
-# shapiro.test(resids)
-
-ggqqplot(data= data.frame(residsDLM1),x="residsDLM1",
-  color = "#2C7C7E",size = 1.6,
-  shape = 1, conf.int.level = 0.95)+ 
-  labs(x = "Cuantiles teóricos",
-       y = "Cuantiles de muestra")+ 
-  theme_minimal_hgrid()
-```
-
+En efecto, en conformidad con @petrisDLM el filtro de Kalman para este simple modelo puede ser expresado de la siguiente manera:$y_{1: t-1}  \sim \mathcal{N}\left(m_{t-1}, R_t=C_{t-1}+W\right)$, $Y_t \mid y_{1: t-1}  \sim \mathcal{N}\left(f_t=m_{t-1}, Q_t=R_t+V\right)$ y $\mu_t \mid y_{1: t}  \sim \mathcal{N}\left(m_t=m_{t-1}+K_t e_t, C_t=K_t V\right)$; donde la notación $y_{1: s}$ hace referencia a las observaciones $y_{1}, y_{2}, \dots, y_{s}$, $e_{t}=Y_{t}-f_{t}$ y $K_{t}=\frac{R_{t}}{Q_{t}}=\frac{C_{t-1}+W}{C_{t-1}+W+V}=1-\frac{1}{\frac{C_{t-1}}{V}+\frac{W}{V}+1}$. De la última ecuación se tiene que para valores altos de $\frac{W}{V}$, $K_{t}$ es cercano a 1. De las mismas ecuaciones que concede el filtro de Kalman se extrae la recursión $m_{t}=K_{t}y_{t}+(1-K_{t})\,m_{t-1}$
+de forma que $K_{t}$ funciona como un peso, y si $\frac{W}{V}$ es grande, entonces $m_{t}$ es "similar" a $y_{t}$ y, por lo tanto, el pronóstico a un paso se parece mucho a la última observación. Es precisamente este fenómeno el que podría estar desembocando en el poco provecho del modelo en términos de sus pronósticos. Debido a que este modelo no es útil para la investigación debido a lo ya indicado, se decide omitir los diagnósticos y los criterios de información. 
 
 ### DLM 2
 
