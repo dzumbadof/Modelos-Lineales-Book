@@ -1,4 +1,5 @@
-# Referencias {.unnumbered}
+# \textcolor{white}{prueba}
+## Referencias {.unnumbered}
 
 ::: {#refs}
 :::

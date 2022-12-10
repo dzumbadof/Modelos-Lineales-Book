@@ -1,8 +1,10 @@
-# Anexo
+# \textcolor{white}{prueba}
 
-## Código 
+## Anexo
 
-### Carga de paquetes
+### Código 
+
+#### Carga de paquetes
 
 ```{r, R.options, include=T, warning=F, message=F}
 options(knitr.kable.NA = '-', echo = FALSE)
@@ -36,7 +38,7 @@ library(dlm)
 library(ggmcmc) #Para ACF Y PACF DLM .
 ```
 
-### Carga de datos y depuración
+#### Carga de datos y depuración
 
 ```{r}
 #| warning: false
@@ -66,7 +68,7 @@ colnames(base) <- c("Año",
 base <- base %>% clean_names()
 ```
 
-### Modelo SARIMA
+#### Modelo SARIMA
 
 División del conjunto de entrenamiento y de prueba. 
 
@@ -140,7 +142,7 @@ L80 <- def.for$pred - def.for$se*qnorm(1-0.2/2)
 for.int <- data.frame(c(2019, 2020), def.for$pred, L80, U80, L95, U95)
 ```
 
-### Modelo DLM polinomial de primer grado
+#### Modelo DLM polinomial de primer grado
 
 ```{r Estimación DLM orden 1}
 #| output: false
@@ -242,7 +244,7 @@ acf_df <-  acf_df[-1,] # Se elimina lag en 0.
 ```
 
 
-### Modelo DLM polinomial de segundo orden
+#### Modelo DLM polinomial de segundo orden
 
 Implementación del modelo
 
