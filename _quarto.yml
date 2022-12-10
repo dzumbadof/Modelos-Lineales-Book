@@ -48,6 +48,8 @@ editor: source
 geometry:
   - left=.75in
   - right=.75in
+  - top=.75in
+  - bottom=.75in
   - textwidth=4.5in
   - marginparsep=.25in
   - marginparwidth=2.25in

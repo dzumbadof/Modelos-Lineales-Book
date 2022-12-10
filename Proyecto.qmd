@@ -1,5 +1,6 @@
 
-
+\vspace{-5 cm}
+# \textcolor{white}{prueba}
 ## Introducción
 
 	
@@ -561,15 +562,13 @@ De los diagnósticos de los residuos @fig-diagDLM2 se osberva del grafico de ACF
 #| fig-cap: 'Gráfico cuantil-cuantil de los residuos para el modelo DLM polinomial de segundo orden'
 #| label: fig-diagqqplotDLM2
 #| message: false
-ggqqplot(data= data.frame(resids),x="resids",
+pplotDLM2 <- ggqqplot(data= data.frame(resids),x="resids",
   color = "#2C7C7E",size = 1,
   shape = 1, conf.int.level = 0.95)+ 
   labs(x = "Cuantiles teóricos",
        y = "Cuantiles de muestra")+ 
   theme_minimal_hgrid()
 ```
-
-De la @fig-diagqqplotDLM2 se ve que el ajuste normal es bueno salvo hacia la cola izquierda.
 
 ```{r}
 #| echo: false
@@ -596,17 +595,28 @@ acf_df <-  acf_df[-1,] # Se elimina lag en 0.
 #| label: fig-pvaluesLjBDLM2
 #| message: false
 
+
+#Se crea el gráfico de valores p del estadístico de Ljung-Box
 graficoLjungBoxDLM2 <- ggplot(data = acf_df) +
     geom_point(aes(lag,pvalue)) +
     geom_hline(yintercept = 0.05, color = "red", lty= 2) 
-graficoLjungBoxDLM2
-
 ```
 
-El grafico @fig-pvaluesLjBDLM2 muestra los p valores para el estadistico Ljung-Box donde se observa que los valores p se encuentran por encima del umbral con valor p de 0.05 (linea punteada), indicando que los residuos del modelo DLM polinomial de orden 2 son independientes. Concluimos, que el modelo ajusta bien o que el modelo no muestra una falta de ajuste.
 
+```{r}
+#| echo: false
+#| fig-cap-location: top
+#| fig-cap: Diagnósticos del modelo DLM de orden 2
+#| fig-subcap: 
+#|   - 'Gráfico cuantil-cuantil de los residuos'
+#|   - 'Valores p del estadistico Ljung-Box'
+#| layout-ncol: 2
+#| label: fig-pplotLjungBox
+pplotDLM2
+graficoLjungBoxDLM2
+```
 
-
+De la @fig-pplotLjungBox se ve que el ajuste normal es bueno salvo hacia la cola izquierda. También muestra los p valores para el estadístico Ljung-Box donde se observa que los valores p se encuentran por encima del umbral con valor p de 0.05 (línea punteada), indicando que los residuos del modelo DLM polinomial de orden 2 son independientes. Concluimos, que el modelo ajusta bien o que el modelo no muestra una falta de ajuste.
 
 
 ```{r}
@@ -657,6 +667,7 @@ estadShapiTestDLM2 <- ShapiTestDLM2$statistic
 #| tbl-cap: "Resumen de diagnósticos de los modelos DLM polinomiales"
 #| label: tbl-diagDLM
 #| tbl-pos: 'h'
+#| tbl-colwidths: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
 
 modeloDLM <- c(' DLM polinomial orden 2')
@@ -676,22 +687,24 @@ QDLM <- c(estadPLjungTestDLM2)
  
  AICcDLM <- c(AICcDLM2)
  
-data.frame(modeloDLM, WDLM, SwpDLM, QDLM, LBpDLM, AICDLM, BICDLM, AICcDLM) %>%
-  kbl(
-    digits = 2,
-    col.names = c(
-      'Modelo',
-      'Estadístico W',
-      "Valor p Shapiro-Wilks",
-      "Estadístico Q",
-      "Valor p Ljung-Box",
-      "AIC",
-      "BIC",
-      "AICc"
-    ), row.names=FALSE) %>%
-  kable_styling(latex_options = c("striped"))  %>%
-  kable_styling(full_width = F) %>% kable_classic_2() %>% row_spec(0, bold =
-                                                                     TRUE)
+ data.frame(modeloDLM, WDLM, SwpDLM, QDLM, LBpDLM, AICDLM, BICDLM, AICcDLM) %>%
+   kbl(
+     digits = 2,
+     col.names = c(
+       'Modelo',
+       'Estadístico W',
+       "Valor p Shapiro-Wilks",
+       "Estadístico Q",
+       "Valor p Ljung-Box",
+       "AIC",
+       "BIC",
+       "AICc"
+     ),
+     row.names = FALSE
+   ) %>%
+   kable_styling(latex_options = c("striped"))  %>%
+   kable_styling(full_width = F) %>% kable_classic_2() %>% 
+   row_spec(0, bold = TRUE) %>% column_spec(1:8, width = '1.7cm')
 ```
 
 
