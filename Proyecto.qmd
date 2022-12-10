@@ -62,7 +62,13 @@ Esta teoría establece que los principales factores causantes de las transicione
 
 Es importante mencionar que tal como lo establece @mariscal2018tres la TTE, tiene como objeto de estudio la mortalidad, ya que se centra en aspectos como: patrones de enfermedad, causas de las muertes y la interacción de estas con patrones demográficos, económicos y sociológicos.
 
-Como antecedentes, se observa que en múltiples investigaciones con temáticas relacionadas a defunciones como el de  @adekambi  y el estudio por @ordorika, se implementan modelos para el pronóstico de series defunciones mediante distintos enfoques, entre ellos pronóstico mediante el empleo de modelos ARIMA, sin embargo estudios más recientes hacen uso de los Modelos Dinámicos Lineales. 
+Como antecedentes, se observa que en múltiples investigaciones con temáticas relacionadas a defunciones como el de  @adekambi  y el estudio por @ordorika, se implementan modelos para el pronóstico de series defunciones mediante distintos enfoques, entre ellos pronóstico mediante el empleo de modelos ARIMA, sin embargo estudios más recientes hacen uso de los Modelos Dinámicos Lineales.
+
+
+Se propone un modelo DLM de primer orden ya que como establece @optimalDLM los DLM de primer orden son algoritmos recomendados al lidiar con datos anuales debido a que las series de tiempo es corta y no presentan patrones estacionales.Dado que nuestros datos son anuales, este modelo se presenta como un posible candidato.
+
+Por su parte @optimalDLM, señala que los DLM de segundo orden son útiles para describir tendencias. Dada la tendencia observada de la serie de defunciones totales sugiere por tanto realizar un modelo  polinomial de segundo orden.
+
 
 Tal como lo establece  @petrisDLM entre los modelos más utilizados para el análisis de series temporales se encuentra la clase de modelos de media móvil autorregresiva (ARMA). Para enteros, no negativos $p$ y $q$, un modelo ARMA$(p,q)$ es definido mediante la notación:
 
